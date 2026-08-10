@@ -1,0 +1,15 @@
+{
+  "name": "fpl-dashboard",
+  "version": "1.0.0",
+  "description": "FPL 2026/27 squad dashboard",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

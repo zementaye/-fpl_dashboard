@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GW1 Team Sheet — 2026/27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --turf-dark:#0a2b20;
+    --turf:#123f2d;
+    --turf-light:#1a5540;
+    --chalk:#f2efe4;
+    --chalk-dim:#c9c4b4;
+    --gold:#cf9f2e;
+    --gold-bright:#e6b93a;
+    --flag:#c1503f;
+    --sky:#5b9db8;
+    --card-bg:#0f3527;
+    --line:rgba(242,239,228,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse at top, #164a35 0%, var(--turf-dark) 55%),
+      var(--turf-dark);
+    color:var(--chalk);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  ::selection{ background:var(--gold); color:var(--turf-dark); }
+
+  /* ===== HERO / PITCH ===== */
+  .hero{
+    position:relative;
+    padding:56px 24px 40px;
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--gold-bright);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:2px;
+    background:var(--gold-bright);
+    display:inline-block;
+  }
+  h1{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size:clamp(38px, 6vw, 68px);
+    letter-spacing:0.01em;
+    text-transform:uppercase;
+    line-height:0.98;
+    color:var(--chalk);
+  }
+  h1 span{ color:var(--gold-bright); }
+  .hero-sub{
+    max-width:560px;
+    color:var(--chalk-dim);
+    font-size:15px;
+    margin-top:14px;
+  }
+
+  .budget-strip{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+    margin-top:28px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .budget-item .num{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:28px;
+    color:var(--chalk);
+  }
+  .budget-item .num.over{ color:var(--flag); }
+  .budget-item .lbl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--chalk-dim);
+  }
+
+  /* pitch */
+  .pitch-wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  .pitch{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/10.5;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        #1c5a42 0,
+        #1c5a42 50px,
+        #17513b 50px,
+        #17513b 100px
+      );
+    border:2px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .pitch::before{ /* center circle + halfway line */
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 0 9.5%, var(--line) 9.5% 9.9%, transparent 9.9%),
+      linear-gradient(to right, transparent 49.85%, var(--line) 49.85% 50.15%, transparent 50.15%);
+  }
+  .pitch::after{ /* penalty boxes top & bottom */
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(to bottom, transparent 0, transparent 0),
+      repeating-linear-gradient(transparent, transparent);
+  }
+  .box-top, .box-bottom{
+    position:absolute;
+    left:28%; width:44%;
+    height:15%;
+    border:1px solid var(--line);
+    border-top:none;
+  }
+  .box-top{ top:0; border-top:none; border-bottom:1px solid var(--line); }
+  .box-bottom{ bottom:0; border-bottom:none; }
+
+  .player-dot{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+    z-index:2;
+  }
+  .dot-circle{
+    width:38px; height:38px;
+    border-radius:50%;
+    background:var(--turf-dark);
+    border:2px solid var(--chalk);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    font-weight:600;
+    color:var(--chalk);
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+    position:relative;
+  }
+  .player-dot:hover .dot-circle{
+    transform:scale(1.12);
+    border-color:var(--gold-bright);
+    background:var(--turf);
+  }
+  .player-dot.captain .dot-circle{
+    border-color:var(--gold-bright);
+    box-shadow:0 0 0 3px rgba(207,159,46,0.28);
+  }
+  .armband{
+    position:absolute;
+    top:-6px; right:-6px;
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--gold-bright);
+    color:var(--turf-dark);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .dot-name{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:600;
+    font-size:12px;
+    color:var(--chalk);
+    white-space:nowrap;
+    text-shadow:0 1px 4px rgba(0,0,0,0.6);
+  }
+
+  .pitch-note{
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--chalk-dim);
+    margin-top:12px;
+    letter-spacing:0.04em;
+  }
+
+  /* ===== SECTIONS ===== */
+  section{
+    max-width:1100px;
+    margin:0 auto;
+    padding:64px 24px 0;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:28px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:16px;
+  }
+  .section-head h2{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size:clamp(24px,3.4vw,34px);
+    text-transform:uppercase;
+    color:var(--chalk);
+  }
+  .section-head .count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--gold-bright);
+  }
+
+  /* filter pills */
+  .pills{
+    display:flex;
+    gap:8px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .pill{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:7px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--chalk-dim);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .pill:hover{ border-color:var(--gold-bright); color:var(--chalk); }
+  .pill.active{
+    background:var(--gold-bright);
+    border-color:var(--gold-bright);
+    color:var(--turf-dark);
+    font-weight:600;
+  }
+
+  /* squad cards */
+  .squad-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:14px;
+  }
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 18px 16px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .card:hover{ border-color:var(--gold-bright); transform:translateY(-2px); }
+  .card.bench{ opacity:0.72; }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .card-name{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:19px;
+    color:var(--chalk);
+    line-height:1.1;
+  }
+  .card-name .cap-tag{
+    color:var(--gold-bright);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    margin-left:6px;
+  }
+  .card-pos{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--chalk-dim);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .card-price{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    color:var(--gold-bright);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .card-pts{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    margin:10px 0 8px;
+  }
+  .card-pts .val{
+    font-family:'Anton', sans-serif;
+    font-size:26px;
+    color:var(--chalk);
+  }
+  .card-pts .lbl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    color:var(--chalk-dim);
+    text-transform:uppercase;
+  }
+  .bar-track{
+    height:4px;
+    background:rgba(242,239,228,0.1);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:12px;
+  }
+  .bar-fill{
+    height:100%;
+    background:linear-gradient(to right, var(--gold), var(--gold-bright));
+  }
+  .card-why{
+    font-size:13px;
+    color:var(--chalk-dim);
+    line-height:1.45;
+  }
+  .status-row{
+    margin-top:12px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.03em;
+    padding:3px 8px;
+    border-radius:4px;
+    text-transform:uppercase;
+  }
+  .tag.nailed{ background:rgba(91,157,184,0.16); color:var(--sky); }
+  .tag.risk{ background:rgba(193,80,63,0.18); color:#e08272; }
+  .tag.value{ background:rgba(207,159,46,0.16); color:var(--gold-bright); }
+
+  /* chip timeline */
+  .timeline{
+    position:relative;
+    padding:30px 0 10px;
+    overflow-x:auto;
+  }
+  .timeline-track{
+    position:relative;
+    min-width:820px;
+    height:3px;
+    background:var(--line);
+    margin:0 10px;
+    border-radius:2px;
+  }
+  .gw-marks{
+    display:flex;
+    justify-content:space-between;
+    min-width:820px;
+    margin:0 10px;
+  }
+  .gw-mark{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--chalk-dim);
+    width:30px;
+    text-align:center;
+  }
+  .chip-node{
+    position:absolute;
+    top:-9px;
+    transform:translateX(-50%);
+    width:20px; height:20px;
+    border-radius:50%;
+    background:var(--turf-dark);
+    border:2px solid var(--gold-bright);
+    cursor:default;
+  }
+  .chip-node::after{
+    content:attr(data-label);
+    position:absolute;
+    top:-34px;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    color:var(--gold-bright);
+    white-space:nowrap;
+  }
+  .chip-legend{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:14px;
+    margin-top:34px;
+  }
+  .chip-card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px;
+    background:var(--card-bg);
+  }
+  .chip-card h4{
+    font-family:'Barlow Condensed', sans-serif;
+    font-size:16px;
+    font-weight:700;
+    color:var(--gold-bright);
+    margin-bottom:6px;
+  }
+  .chip-card p{
+    font-size:12.5px;
+    color:var(--chalk-dim);
+  }
+
+  footer{
+    max-width:1100px;
+    margin:64px auto 0;
+    padding:24px;
+    border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--chalk-dim);
+    line-height:1.7;
+  }
+
+  @media (max-width:600px){
+    .dot-name{ display:none; }
+    .budget-strip{ gap:20px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="eyebrow">2026/27 · Gameweek 1</div>
+    <h1>Team Sheet <span>&amp; Data</span></h1>
+    <p class="hero-sub">Your 15-man squad, projected points, and the reasoning behind every pick — built from live prices, expert fixture models, and last season's underlying numbers.</p>
+
+    <div class="budget-strip" id="budgetStrip"></div>
+  </div>
+
+  <div class="pitch-wrap">
+    <div class="pitch" id="pitch">
+      <div class="box-top"></div>
+      <div class="box-bottom"></div>
+    </div>
+    <div class="pitch-note">3‑4‑3 · tap a player to jump to their card · gold ring = captain</div>
+  </div>
+
+  <section id="squad">
+    <div class="section-head">
+      <h2>Full Squad</h2>
+      <span class="count">15 players · £104.5m</span>
+    </div>
+    <div class="pills" id="pills">
+      <button class="pill active" data-filter="all">All</button>
+      <button class="pill" data-filter="GK">Keepers</button>
+      <button class="pill" data-filter="DEF">Defenders</button>
+      <button class="pill" data-filter="MID">Midfielders</button>
+      <button class="pill" data-filter="FWD">Forwards</button>
+      <button class="pill" data-filter="bench">Bench only</button>
+    </div>
+    <div class="squad-grid" id="squadGrid"></div>
+  </section>
+
+  <section id="chips">
+    <div class="section-head">
+      <h2>Chip Roadmap</h2>
+      <span class="count">GW1 → GW10</span>
+    </div>
+    <div class="timeline">
+      <div class="gw-marks" id="gwMarks"></div>
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="chip-legend">
+      <div class="chip-card">
+        <h4>Wildcard</h4>
+        <p>Hold. Preseason prices and roles are still settling — early wildcards regularly get outdated by GW4–6. Best window: GW6–8 once fixtures swing, or straight after a squad-wide bad start.</p>
+      </div>
+      <div class="chip-card">
+        <h4>Free Hit</h4>
+        <p>Save entirely. It's wasted in weeks where everyone plays — hold it for the first blank or double gameweek later in the season.</p>
+      </div>
+      <div class="chip-card">
+        <h4>Triple Captain</h4>
+        <p>Haaland's home run vs Bournemouth/Coventry/Sunderland (GW1/3/5) is tempting, but a genuine double gameweek later usually gives more upside. Worth a look around GW3 or 5 if no double has appeared yet.</p>
+      </div>
+      <div class="chip-card">
+        <h4>Bench Boost</h4>
+        <p>Needs all four bench players nailed and playing — not there yet with a backup GK and rotation-risk defenders. Revisit once bench minutes are confirmed, ideally paired with a double gameweek.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    NOTE — Projected points are directional estimates built from last season's output, fixture difficulty, and role security, not the official FPL algorithm. Several 2026/27 prices and roles (Szoboszlai's penalty duty, Andersen's exact price, final squad prices) are still preseason-fluid. Re-verify against the live FPL app before the August 21 deadline.
+  </footer>
+
+<script>
+const PLAYERS = [
+  {name:"Emiliano Martínez", pos:"GK", team:"Aston Villa", price:5.0, pts:"22–26", why:"Solid last season (120 pts), Villa defense stable.", start:true, x:50, y:90, tags:["nailed"]},
+  {name:"Backup GK", pos:"GK", team:"TBC", price:4.0, pts:"2–4", why:"Bench fodder — minimal expected minutes.", start:false, tags:[]},
+
+  {name:"Gabriel", pos:"DEF", team:"Arsenal", price:8.0, pts:"30–34", why:"Top defender for points last season, huge set-piece and bonus volume.", start:true, x:25, y:68, tags:["nailed","value"]},
+  {name:"Matty Cash", pos:"DEF", team:"Aston Villa", price:4.5, pts:"18–22", why:"Attacking output at a cheap price, consistent starter.", start:true, x:75, y:68, tags:["nailed"]},
+  {name:"Ezri Konsa", pos:"DEF", team:"Aston Villa", price:4.5, pts:"16–20", why:"Reliable defensive-contribution floor, lower ceiling.", start:true, x:50, y:72, tags:["nailed"]},
+  {name:"Joachim Andersen", pos:"DEF", team:"Fulham", price:4.5, pts:"18–22", why:"Strong defcon volume, nailed CB, winnable early games. Swapped in for Senesi, who moved to Spurs.", start:false, tags:["value"]},
+  {name:"Neco Williams", pos:"DEF", team:"Nott'm Forest", price:5.0, pts:"20–24", why:"Best points-per-million defender in current models; attacking wing-back role.", start:false, tags:["value"]},
+
+  {name:"Bukayo Saka", pos:"MID", team:"Arsenal", price:9.5, pts:"34–38", why:"Elite underlying numbers on a title-winning platform.", start:true, x:85, y:44, tags:["nailed"]},
+  {name:"Declan Rice", pos:"MID", team:"Arsenal", price:7.5, pts:"30–34", why:"184 points last season — set-piece plus defensive-contribution combo.", start:true, x:38, y:50, tags:["nailed"]},
+  {name:"Bruno Fernandes", pos:"MID", team:"Man Utd", price:10.0, pts:"36–40", why:"Top scorer in Fantasy over last season's final 17 gameweeks; favorable Hull/Ipswich opener.", start:true, x:62, y:46, tags:["nailed","value"]},
+  {name:"Dominik Szoboszlai", pos:"MID", team:"Liverpool", price:7.0, pts:"26–30", why:"Elite presser and set-piece weapon, in play for penalties post-Salah.", start:true, x:15, y:48, tags:["value","risk"]},
+  {name:"Pascal Gross", pos:"MID", team:"Brighton", price:5.5, pts:"16–20", why:"Cheap enabler, penalty-adjacent — rotation risk vs Villa opener.", start:false, tags:["risk"]},
+
+  {name:"Erling Haaland", pos:"FWD", team:"Man City", price:15.5, pts:"45–50", why:"Big favorite for an early Triple Captain — home vs Coventry and Ipswich early on.", start:true, x:50, y:15, captain:true, tags:["nailed"]},
+  {name:"Dominic Calvert-Lewin", pos:"FWD", team:"Leeds", price:6.0, pts:"24–28", why:"Penalty taker with a genuinely attractive opening fixture run.", start:true, x:25, y:20, tags:["nailed","value"]},
+  {name:"João Pedro", pos:"FWD", team:"Chelsea", price:7.5, pts:"28–32", why:"Strongest non-Haaland forward option in this bracket — 19 goal contributions last season. Swapped in for Ekitike, ruled out with a long-term Achilles injury.", start:true, x:75, y:20, tags:["value"]},
+];
+
+const CHIPS = [
+  {gw:1, label:"GW1: no chip"},
+  {gw:3, label:"TC window opens"},
+  {gw:7, label:"WC window opens"},
+];
+
+// --- Budget strip ---
+const total = PLAYERS.reduce((s,p)=>s+p.price,0);
+const budgetStrip = document.getElementById('budgetStrip');
+const overBudget = total > 100;
+budgetStrip.innerHTML = `
+  <div class="budget-item"><div class="num ${overBudget?'over':''}">£${total.toFixed(1)}m</div><div class="lbl">Squad cost</div></div>
+  <div class="budget-item"><div class="num ${overBudget?'over':''}">£${(total-100).toFixed(1)}m</div><div class="lbl">${overBudget?'Over budget':'In the bank'}</div></div>
+  <div class="budget-item"><div class="num">15</div><div class="lbl">Players</div></div>
+  <div class="budget-item"><div class="num">11</div><div class="lbl">Starting XI</div></div>
+`;
+
+// --- Pitch ---
+const pitch = document.getElementById('pitch');
+PLAYERS.filter(p=>p.start).forEach(p=>{
+  const dot = document.createElement('div');
+  dot.className = 'player-dot' + (p.captain ? ' captain' : '');
+  dot.style.left = p.x + '%';
+  dot.style.top = p.y + '%';
+  dot.innerHTML = `
+    <div class="dot-circle">${initials(p.name)}${p.captain?'<div class="armband">C</div>':''}</div>
+    <div class="dot-name">${p.name.split(' ').pop()}</div>
+  `;
+  dot.addEventListener('click', ()=>{
+    const card = document.getElementById('card-'+slug(p.name));
+    if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); flash(card); }
+  });
+  pitch.appendChild(dot);
+});
+
+function initials(name){
+  return name.split(' ').map(w=>w[0]).slice(-2).join('').toUpperCase();
+}
+function slug(name){ return name.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+function flash(el){
+  el.style.borderColor = 'var(--gold-bright)';
+  el.style.transition = 'border-color .3s ease';
+  setTimeout(()=>{ el.style.borderColor = ''; }, 1200);
+}
+
+// --- Squad grid ---
+const grid = document.getElementById('squadGrid');
+function renderGrid(filter){
+  grid.innerHTML = '';
+  PLAYERS.filter(p=>{
+    if(filter==='all') return true;
+    if(filter==='bench') return !p.start;
+    return p.pos===filter;
+  }).forEach(p=>{
+    const maxPts = 50;
+    const avgPts = p.pts.split('–').map(Number).reduce((a,b)=>a+b,0)/2 || 0;
+    const card = document.createElement('div');
+    card.className = 'card' + (!p.start ? ' bench' : '');
+    card.id = 'card-' + slug(p.name);
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <div class="card-name">${p.name}${p.captain?'<span class="cap-tag">CAPTAIN</span>':''}</div>
+          <div class="card-pos">${p.pos} · ${p.team}${p.start?'':' · bench'}</div>
+        </div>
+        <div class="card-price">£${p.price.toFixed(1)}m</div>
+      </div>
+      <div class="card-pts"><div class="val">${p.pts}</div><div class="lbl">proj pts&nbsp;GW1–6</div></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(avgPts/maxPts)*100)}%"></div></div>
+      <div class="card-why">${p.why}</div>
+      <div class="status-row">${(p.tags||[]).map(t=>`<span class="tag ${t}">${t}</span>`).join('')}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+renderGrid('all');
+
+document.querySelectorAll('.pill').forEach(pill=>{
+  pill.addEventListener('click', ()=>{
+    document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    renderGrid(pill.dataset.filter);
+  });
+});
+
+// --- Chip timeline ---
+const gwMarks = document.getElementById('gwMarks');
+const track = document.getElementById('timelineTrack');
+for(let i=1;i<=10;i++){
+  const m = document.createElement('div');
+  m.className = 'gw-mark';
+  m.textContent = 'GW'+i;
+  gwMarks.appendChild(m);
+}
+CHIPS.forEach(c=>{
+  const node = document.createElement('div');
+  node.className = 'chip-node';
+  node.setAttribute('data-label', c.label);
+  node.style.left = ((c.gw-1)/9*100) + '%';
+  track.appendChild(node);
+});
+</script>
+
+</body>
+</html>
