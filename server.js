@@ -46,7 +46,7 @@ app.post('/api/assistant', async (req, res) => {
 
   try {
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
       {
         method: 'POST',
         headers: {
@@ -56,7 +56,7 @@ app.post('/api/assistant', async (req, res) => {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SQUAD_CONTEXT }] },
           contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-          generationConfig: { maxOutputTokens: 700, temperature: 0.6 },
+          generationConfig: { maxOutputTokens: 700 },
         }),
       }
     );
