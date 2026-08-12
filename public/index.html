@@ -346,6 +346,48 @@
     color:var(--chalk-dim);
     line-height:1.45;
   }
+  .card-detail{
+    font-size:12.5px;
+    color:var(--chalk-dim);
+    line-height:1.55;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+    display:none;
+  }
+  .card-detail.open{ display:block; }
+  .card-detail .stat-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--sky);
+    margin-bottom:6px;
+    display:block;
+  }
+  .card-detail .risk-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:#e08272;
+    margin-top:6px;
+    display:block;
+  }
+  .expand-btn{
+    background:none;
+    border:none;
+    color:var(--gold-bright);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+    padding:0;
+    margin-top:10px;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  .expand-btn:hover{ color:var(--chalk); }
+  .expand-btn .arrow{ transition:transform .2s ease; display:inline-block; }
+  .expand-btn.open .arrow{ transform:rotate(180deg); }
   .status-row{
     margin-top:12px;
     display:flex;
@@ -436,6 +478,305 @@
     color:var(--chalk-dim);
   }
 
+  /* ===== WEEKLY BEST XI ===== */
+  .gw-tabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    margin-bottom:26px;
+  }
+  .gw-tab{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:9px 18px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--card-bg);
+    color:var(--chalk-dim);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .gw-tab:hover{ border-color:var(--gold-bright); }
+  .gw-tab.active{
+    background:var(--gold-bright);
+    border-color:var(--gold-bright);
+    color:var(--turf-dark);
+  }
+
+  .gw-panel{
+    display:none;
+    animation:fadein .25s ease;
+  }
+  .gw-panel.active{ display:block; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .gw-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .gw-title{
+    font-family:'Anton', sans-serif;
+    font-size:22px;
+    text-transform:uppercase;
+    color:var(--chalk);
+  }
+  .gw-captain-badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--gold-bright);
+    border:1px solid var(--gold-bright);
+    border-radius:999px;
+    padding:5px 12px;
+  }
+  .gw-reasoning{
+    font-size:13.5px;
+    color:var(--chalk-dim);
+    line-height:1.6;
+    max-width:760px;
+    margin-bottom:22px;
+  }
+  .fixture-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  .fixture-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    padding:5px 10px;
+    border-radius:5px;
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+  }
+  .fixture-chip.easy{ border-color:rgba(91,157,184,0.4); color:var(--sky); }
+  .fixture-chip.hard{ border-color:rgba(193,80,63,0.4); color:#e08272; }
+
+  .xi-columns{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .xi-col-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--chalk-dim);
+    margin-bottom:10px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .xi-player{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    font-size:13px;
+  }
+  .xi-player .xi-name{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--chalk);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .xi-player .xi-note{
+    font-size:11px;
+    color:var(--chalk-dim);
+    margin-top:3px;
+  }
+  .xi-player.captain{ border-color:var(--gold-bright); }
+  .xi-player .cap-icon{
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--gold-bright);
+    color:var(--turf-dark);
+    font-size:9px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .bench-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .bench-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--chalk-dim);
+    padding:6px 12px;
+    border:1px dashed var(--line);
+    border-radius:5px;
+  }
+  .bench-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--chalk-dim);
+    align-self:center;
+    margin-right:4px;
+  }
+
+  @media (max-width:760px){
+    .xi-columns{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:480px){
+    .xi-columns{ grid-template-columns:1fr; }
+  }
+
+  /* ===== TRANSFER CONTINGENCY BOARD ===== */
+  .contingency-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+    gap:14px;
+  }
+  .cont-card{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .cont-trigger{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:#e08272;
+    margin-bottom:8px;
+  }
+  .cont-arrow{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--chalk);
+    margin-bottom:8px;
+  }
+  .cont-arrow .to{ color:var(--gold-bright); }
+  .cont-why{
+    font-size:12.5px;
+    color:var(--chalk-dim);
+    line-height:1.5;
+  }
+
+  /* ===== AI ASSISTANT ===== */
+  .assistant-wrap{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+  }
+  .assistant-hint{
+    font-size:13px;
+    color:var(--chalk-dim);
+    margin-bottom:16px;
+    line-height:1.55;
+  }
+  .assistant-log{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-bottom:16px;
+    max-height:420px;
+    overflow-y:auto;
+  }
+  .msg{
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:13.5px;
+    line-height:1.55;
+    max-width:90%;
+    white-space:pre-wrap;
+  }
+  .msg.user{
+    align-self:flex-end;
+    background:rgba(207,159,46,0.14);
+    border:1px solid rgba(207,159,46,0.3);
+    color:var(--chalk);
+  }
+  .msg.assistant{
+    align-self:flex-start;
+    background:rgba(242,239,228,0.05);
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+  }
+  .msg.error{
+    align-self:flex-start;
+    background:rgba(193,80,63,0.12);
+    border:1px solid rgba(193,80,63,0.35);
+    color:#e08272;
+  }
+  .assistant-input-row{
+    display:flex;
+    gap:10px;
+  }
+  .assistant-input-row textarea{
+    flex:1;
+    resize:none;
+    background:var(--turf-dark);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--chalk);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+    padding:10px 12px;
+    min-height:44px;
+  }
+  .assistant-input-row textarea:focus{
+    outline:none;
+    border-color:var(--gold-bright);
+  }
+  .assistant-input-row button{
+    background:var(--gold-bright);
+    border:none;
+    border-radius:6px;
+    padding:0 20px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--turf-dark);
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .assistant-input-row button:hover{ opacity:0.85; }
+  .assistant-input-row button:disabled{ opacity:0.5; cursor:not-allowed; }
+  .assistant-suggestions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .sugg-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+    background:transparent;
+    cursor:pointer;
+  }
+  .sugg-chip:hover{ border-color:var(--gold-bright); color:var(--chalk); }
+
   footer{
     max-width:1100px;
     margin:64px auto 0;
@@ -474,7 +815,7 @@
   <section id="squad">
     <div class="section-head">
       <h2>Full Squad</h2>
-      <span class="count">15 players · £104.5m</span>
+      <span class="count">15 players · £100.0m</span>
     </div>
     <div class="pills" id="pills">
       <button class="pill active" data-filter="all">All</button>
@@ -485,6 +826,15 @@
       <button class="pill" data-filter="bench">Bench only</button>
     </div>
     <div class="squad-grid" id="squadGrid"></div>
+  </section>
+
+  <section id="weekly">
+    <div class="section-head">
+      <h2>Best XI, Week by Week</h2>
+      <span class="count">GW1 → GW6</span>
+    </div>
+    <div class="gw-tabs" id="gwTabs"></div>
+    <div id="gwPanels"></div>
   </section>
 
   <section id="chips">
@@ -513,8 +863,44 @@
         <h4>Bench Boost</h4>
         <p>Needs all four bench players nailed and playing — not there yet with a backup GK and rotation-risk defenders. Revisit once bench minutes are confirmed, ideally paired with a double gameweek.</p>
       </div>
+      <div class="chip-card">
+        <h4>Formation flex (not a chip)</h4>
+        <p>FPL squads are fixed at 3 forwards — you can't just buy a 4th one in for rotation. The real lever for a bad forward fixture (like Calvert-Lewin's GW1) is switching formation from 3-4-3 to 3-5-2 or 4-4-2, benching the worse-fixture forward and starting Gross or a 5th defender instead. No transfer needed — it's built into the squad you already have.</p>
+      </div>
     </div>
   </section>
+
+  <section id="contingency">
+    <div class="section-head">
+      <h2>Transfer Contingency Board</h2>
+      <span class="count">if this happens → do this</span>
+    </div>
+    <p class="gw-reasoning">Pre-planned reactions for the squad's shakiest spots — so a piece of news mid-week doesn't mean starting from scratch. These are the players worth watching, and what to do if the risk actually materializes.</p>
+    <div class="contingency-grid" id="contingencyGrid"></div>
+  </section>
+
+  <section id="assistant">
+    <div class="section-head">
+      <h2>Squad AI Assistant</h2>
+      <span class="count">ask about news, injuries, transfers</span>
+    </div>
+    <div class="assistant-wrap">
+      <p class="assistant-hint">Tell it what's changed — an injury, a bad gameweek, a transfer rumor — and it'll factor it against your actual squad. <strong>Needs a <code>GEMINI_API_KEY</code> set in your Render service's Environment tab to work</strong> (free, no card needed) — see the README for the 2-minute setup.</p>
+      <div class="assistant-suggestions" id="assistantSuggestions"></div>
+      <div class="assistant-log" id="assistantLog"></div>
+      <div class="assistant-input-row">
+        <textarea id="assistantInput" placeholder="e.g. Szoboszlai just got ruled out for 3 weeks — who should I bring in?" rows="1"></textarea>
+        <button id="assistantSend" type="button">Ask</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="budget-note">
+    <div class="section-head">
+      <h2>Budget Check</h2>
+      <span class="count">£100.0m · £0.0m ITB</span>
+    </div>
+    <p class="gw-reasoning">Squad prices were re-balanced down from an earlier ~£104m estimate to land exactly at £100.0m, with zero in the bank. The trims came entirely from bench-tier players whose prices were the least certain to begin with (Cash, Konsa, Andersen and Williams down to £4.0m, Szoboszlai to £6.5m, Gross to £4.5m) — nothing was cut from the core starters (Haaland, Saka, Rice, Bruno, Gabriel, João Pedro, Calvert-Lewin) since those prices came from more directly confirmed sources. Treat this as a working budget rather than gospel: once official GW1 prices go live, some of these will land a little higher or lower, and any leftover ITB is fair game to spend on an upgrade.</p>
 
   <footer>
     NOTE — Projected points are directional estimates built from last season's output, fixture difficulty, and role security, not the official FPL algorithm. Several 2026/27 prices and roles (Szoboszlai's penalty duty, Andersen's exact price, final squad prices) are still preseason-fluid. Re-verify against the live FPL app before the August 21 deadline.
@@ -522,30 +908,182 @@
 
 <script>
 const PLAYERS = [
-  {name:"Emiliano Martínez", pos:"GK", team:"Aston Villa", price:5.0, pts:"22–26", why:"Solid last season (120 pts), Villa defense stable.", start:true, x:50, y:90, tags:["nailed"]},
-  {name:"Backup GK", pos:"GK", team:"TBC", price:4.0, pts:"2–4", why:"Bench fodder — minimal expected minutes.", start:false, tags:[]},
+  {name:"Emiliano Martínez", pos:"GK", team:"Aston Villa", price:5.0, pts:"22–26", why:"Solid last season (120 pts), Villa defense stable.", start:true, x:50, y:90, tags:["nailed"],
+    stat:"120 pts · 95 saves last season", risk:"Villa's early fixtures (Brighton A, Arsenal H) are mixed — clean sheets aren't guaranteed GW1-2.",
+    detail:"Martínez is the clear #1 at Villa Park with zero competition for the gloves, which is worth more than raw save numbers — a keeper who might be rotated is a genuine risk at this price point, and he isn't one. Villa's defense settled into a reliable mid-table shape last season, giving him a save-points floor even in matches where they don't keep it out entirely. He's priced a full £1m-plus below several less secure alternatives, which is really the whole case: you're paying for certainty of minutes, not for the best underlying defense in the league."},
+  {name:"Backup GK", pos:"GK", team:"TBC", price:4.0, pts:"2–4", why:"Bench fodder — minimal expected minutes.", start:false, tags:[],
+    stat:"Pure squad filler", risk:"Won't play unless there's an injury to your #1.",
+    detail:"This slot exists purely to satisfy squad rules as cheaply as possible, freeing up budget for the pitch. Once GW1 squads lock, swap this for whichever £4.0m keeper has the most nailed-on starting spot at their club — the actual name matters far less than the price tag, since you're not expecting minutes from him unless Martínez picks up an injury or suspension."},
 
-  {name:"Gabriel", pos:"DEF", team:"Arsenal", price:8.0, pts:"30–34", why:"Top defender for points last season, huge set-piece and bonus volume.", start:true, x:25, y:68, tags:["nailed","value"]},
-  {name:"Matty Cash", pos:"DEF", team:"Aston Villa", price:4.5, pts:"18–22", why:"Attacking output at a cheap price, consistent starter.", start:true, x:75, y:68, tags:["nailed"]},
-  {name:"Ezri Konsa", pos:"DEF", team:"Aston Villa", price:4.5, pts:"16–20", why:"Reliable defensive-contribution floor, lower ceiling.", start:true, x:50, y:72, tags:["nailed"]},
-  {name:"Joachim Andersen", pos:"DEF", team:"Fulham", price:4.5, pts:"18–22", why:"Strong defcon volume, nailed CB, winnable early games. Swapped in for Senesi, who moved to Spurs.", start:false, tags:["value"]},
-  {name:"Neco Williams", pos:"DEF", team:"Nott'm Forest", price:5.0, pts:"20–24", why:"Best points-per-million defender in current models; attacking wing-back role.", start:false, tags:["value"]},
+  {name:"Gabriel", pos:"DEF", team:"Arsenal", price:8.0, pts:"30–34", why:"Top defender for points last season, huge set-piece and bonus volume.", start:true, x:25, y:68, tags:["nailed","value"],
+    stat:"209 pts last season — highest of any defender", risk:"Priced at a premium, so he eats into budget elsewhere.",
+    detail:"Gabriel isn't just a clean-sheet defender — he's a genuine attacking threat from set pieces on the best defense in the league, which is why he outscored every other defender in the game last season. Arsenal's platform (title-winners, tightest backline, Saka/Rice/Odegaard-level service from midfield) means his goal threat compounds with clean-sheet reliability rather than trading off against it. At £8.0m he's expensive for the position, but the points-per-million still stacks up against cheaper names once you account for his bonus-point volume."},
+  {name:"Matty Cash", pos:"DEF", team:"Aston Villa", price:4.0, pts:"16–20", why:"Attacking output at a cheap price, consistent starter.", start:true, x:75, y:68, tags:["nailed"],
+    stat:"Ever-present starter, strong final-third involvement", risk:"Villa's attacking output overall dipped at times last season — some weeks lean quiet.",
+    detail:"Cash's value case is about nailed minutes plus a right-back role that pushes forward — Villa play him as a genuine outlet down the right, which keeps his attacking-return ceiling higher than most budget defenders. He's not a set-piece threat, so his floor depends on defensive-contribution points and the odd assist rather than a Gabriel-style goal threat, but as a budget enabler he does his job without needing to be benched for rotation risk."},
+  {name:"Ezri Konsa", pos:"DEF", team:"Aston Villa", price:4.0, pts:"15–19", why:"Reliable defensive-contribution floor, lower ceiling.", start:true, x:50, y:72, tags:["nailed"],
+    stat:"100 pts last season, ever-present centre-back", risk:"Lowest attacking upside of your defensive options — floor over ceiling.",
+    detail:"Konsa is the steady-eddie pick in this defense — no penalty duty, no set-piece involvement, but he reliably racks up defensive-contribution points (tackles, interceptions, clearances) under the newer DefCon scoring system, which gives him a points floor most cheap centre-backs don't have. He's the kind of player you can trust to start every week without thinking about him, which has real value in a squad slot you don't want to actively manage."},
+  {name:"Joachim Andersen", pos:"DEF", team:"Fulham", price:4.0, pts:"16–20", why:"Strong defcon volume, nailed CB, winnable early games. Swapped in for Senesi, who moved to Spurs.", start:false, tags:["value"],
+    stat:"Elite defensive-contribution rate among Premier League CBs", risk:"Fulham's overall defensive record is inconsistent, capping clean-sheet frequency.",
+    detail:"Andersen was one of the free swaps forced by news, not by choice — Senesi's move to Tottenham took him out of the picture as a budget option, since he's now £6.0m at a club whose possession-heavy style under De Zerbi may actually reduce his defensive-contribution touches. Andersen fills the same defcon-floor role at the same price point, and he's a nailed starter at Fulham with no rotation threat. He won't be a clean-sheet machine, but he doesn't need to be — the defcon points alone justify the price."},
+  {name:"Neco Williams", pos:"DEF", team:"Nott'm Forest", price:4.0, pts:"18–22", why:"Best points-per-million defender in current models; attacking wing-back role.", start:false, tags:["value"],
+    stat:"Highest defender points-per-million per current projections", risk:"Forest's away form and rotation under a new-look squad add some uncertainty.",
+    detail:"Williams' case is built on role rather than reputation — Forest deploy him as an attacking wing-back rather than a conventional full-back, which gives him a genuine route to assists and shot involvement on top of the usual defensive-contribution baseline. That combination is exactly what makes cheap defenders profitable in FPL: he's not just there to avoid conceding, he's part of the attack. He starts on your bench for now purely because Cash and Konsa's minutes are more secure early on, but he's a strong first defensive substitute the moment either has a tough matchup."},
 
-  {name:"Bukayo Saka", pos:"MID", team:"Arsenal", price:9.5, pts:"34–38", why:"Elite underlying numbers on a title-winning platform.", start:true, x:85, y:44, tags:["nailed"]},
-  {name:"Declan Rice", pos:"MID", team:"Arsenal", price:7.5, pts:"30–34", why:"184 points last season — set-piece plus defensive-contribution combo.", start:true, x:38, y:50, tags:["nailed"]},
-  {name:"Bruno Fernandes", pos:"MID", team:"Man Utd", price:10.0, pts:"36–40", why:"Top scorer in Fantasy over last season's final 17 gameweeks; favorable Hull/Ipswich opener.", start:true, x:62, y:46, tags:["nailed","value"]},
-  {name:"Dominik Szoboszlai", pos:"MID", team:"Liverpool", price:7.0, pts:"26–30", why:"Elite presser and set-piece weapon, in play for penalties post-Salah.", start:true, x:15, y:48, tags:["value","risk"]},
-  {name:"Pascal Gross", pos:"MID", team:"Brighton", price:5.5, pts:"16–20", why:"Cheap enabler, penalty-adjacent — rotation risk vs Villa opener.", start:false, tags:["risk"]},
+  {name:"Bukayo Saka", pos:"MID", team:"Arsenal", price:9.5, pts:"34–38", why:"Elite underlying numbers on a title-winning platform.", start:true, x:85, y:44, tags:["nailed"],
+    stat:"7 goals, 10 assists, 14.73 combined xG+xA last season", risk:"Had injury spells last season — worth monitoring pre-season fitness news.",
+    detail:"Saka is the standard against which every other midfield pick in this price range gets measured — his underlying numbers (goal involvement, chance creation, shot volume) were elite even in a season where injuries cost him minutes. On a title-winning Arsenal side that should create even more chances this season, the expectation is his output climbs rather than repeats. The one real caveat is durability: his lower minutes last season were injury-driven rather than form-driven, so it's worth a final fitness check before the GW1 deadline rather than assuming he's automatically 90 minutes."},
+  {name:"Declan Rice", pos:"MID", team:"Arsenal", price:7.5, pts:"30–34", why:"184 points last season — set-piece plus defensive-contribution combo.", start:true, x:38, y:50, tags:["nailed"],
+    stat:"184 pts, 9 assists, elite defensive-contribution volume", risk:"Some fitness questions floated in preseason — worth a final check before deadline.",
+    detail:"Rice is one of the rare midfielders who scores from both ends of the pitch in FPL terms — he's a genuine set-piece and chance-creation threat going forward, and he racks up defensive-contribution points at a rate few midfielders match, thanks to how much defensive work he still does at the base of Arsenal's midfield. That dual profile is why he outscored a lot of more attack-minded midfielders last season despite not being a primary goal threat. The only asterisk is some fitness chatter heading into preseason — nothing confirmed as serious, but worth a last look before you lock your squad."},
+  {name:"Bruno Fernandes", pos:"MID", team:"Man Utd", price:10.0, pts:"36–40", why:"Top scorer in Fantasy over last season's final 17 gameweeks; favorable Hull/Ipswich opener.", start:true, x:62, y:46, tags:["nailed","value"],
+    stat:"Top-scoring player in Fantasy across the season's final 17 gameweeks", risk:"One of the priciest midfielders in the game — a big chunk of budget in one player.",
+    detail:"Fernandes' case is about recent form, not reputation — under Michael Carrick's management from Gameweek 22 onward last season, he was the single highest-scoring player in the entire game, averaging 7.6 points per match. He takes penalties and set pieces, so his points floor doesn't depend on open-play goals alone. Add in a genuinely kind opener — back-to-back matches against two promoted sides, Hull away then Ipswich at home — and he's arguably a stronger early-season captaincy rival to Haaland than his price alone would suggest."},
+  {name:"Dominik Szoboszlai", pos:"MID", team:"Liverpool", price:6.5, pts:"26–30", why:"Elite presser and set-piece weapon, in play for penalties post-Salah.", start:true, x:15, y:48, tags:["value","risk"],
+    stat:"205 crosses, 78 chances created, 120 passes into the box last season", risk:"Exact role under new manager Iraola isn't fully confirmed — could even start at right-back.",
+    detail:"Szoboszlai's underlying output last season was among the best in the league for chance creation from a deep-lying role, and with Salah gone, he's now a live candidate for penalty duty, which would meaningfully raise his ceiling. The catch is real, though: his price hasn't moved despite that season, which the game's pricing algorithm seems to read as uncertainty, and there's genuine ambiguity about where new manager Iraola actually plays him — some reports even float him at right-back. He's a calculated bet on role rather than a locked-in certainty, which is why he's tagged as a risk here."},
+  {name:"Pascal Gross", pos:"MID", team:"Brighton", price:4.5, pts:"14–18", why:"Cheap enabler, penalty-adjacent — rotation risk vs Villa opener.", start:false, tags:["risk"],
+    stat:"Likely inherits set-piece duties after Welbeck's departure", risk:"Brighton's GW1 fixture (home to Villa) isn't the easiest possible start.",
+    detail:"Gross's appeal is almost entirely about budget efficiency — with Danny Welbeck gone, he's in line to take over Brighton's penalty and set-piece duties, which is exactly the kind of role upgrade that turns a cheap squad filler into an actual points source. He's on your bench to start the season mainly because Brighton's GW1 tie against Aston Villa isn't the gentle opener you'd want for a first start, but he's the first midfield sub the moment his fixtures turn kinder or Szoboszlai's role stays murky."},
 
-  {name:"Erling Haaland", pos:"FWD", team:"Man City", price:15.5, pts:"45–50", why:"Big favorite for an early Triple Captain — home vs Coventry and Ipswich early on.", start:true, x:50, y:15, captain:true, tags:["nailed"]},
-  {name:"Dominic Calvert-Lewin", pos:"FWD", team:"Leeds", price:6.0, pts:"24–28", why:"Penalty taker with a genuinely attractive opening fixture run.", start:true, x:25, y:20, tags:["nailed","value"]},
-  {name:"João Pedro", pos:"FWD", team:"Chelsea", price:7.5, pts:"28–32", why:"Strongest non-Haaland forward option in this bracket — 19 goal contributions last season. Swapped in for Ekitike, ruled out with a long-term Achilles injury.", start:true, x:75, y:20, tags:["value"]},
+  {name:"Erling Haaland", pos:"FWD", team:"Man City", price:15.5, pts:"45–50", why:"Big favorite for an early Triple Captain — home vs Coventry and Ipswich early on.", start:true, x:50, y:15, captain:true, tags:["nailed"],
+    stat:"Home vs Bournemouth, Coventry and Sunderland in GW1, 3 and 5", risk:"His price alone locks up over 15% of your entire budget.",
+    detail:"There isn't much mystery to the Haaland pick — he's the highest-scoring forward in the game by a wide margin whenever fit, and his opening schedule is about as generous as it gets, with three home fixtures against newly promoted or historically softer opposition inside his first five games. The only real 'risk' is opportunity cost: at over 15% of your total budget, every pound spent on him is a pound not spent building depth elsewhere, which is exactly why the rest of this squad leans toward value picks around him."},
+  {name:"Dominic Calvert-Lewin", pos:"FWD", team:"Leeds", price:6.0, pts:"24–28", why:"Cheap, nailed-on penalty taker — started despite a tough GW1, mainly because your squad has no bench forward to rotate in.", start:true, x:25, y:20, tags:["nailed","value"],
+    stat:"14 goals last season, now Leeds' first-choice striker and penalty taker", risk:"GW1 is genuinely one of his harder fixtures — away at a Nottingham Forest side fixture trackers flag as a tough opener, not a soft one.",
+    detail:"Correcting myself here: I'd previously framed this pick around an 'attractive opening fixture run,' but that doesn't hold for Gameweek 1 specifically. Leeds travel to Nottingham Forest to open the season, and that fixture is flagged as one of the harder away trips in the league for a promoted-adjacent side — not a banker game. His fixtures do improve later (home ties against Newcastle and Crystal Palace show up around GW4-5), so the season-long case still holds, but GW1 itself isn't where the appeal is. The real reason he starts anyway: with only 3 forwards in this 15-man squad and no bench forward to rotate in, Calvert-Lewin plays every week by squad structure, not because every fixture suits him. His price (£6.0m) and penalty duties keep the downside limited even in a tough week — but going in with clear eyes, GW1 is a weaker starting fixture than the rest of this XI enjoys."},
+  {name:"João Pedro", pos:"FWD", team:"Chelsea", price:7.5, pts:"28–32", why:"Strongest non-Haaland forward option in this bracket — 19 goal contributions last season. Swapped in for Ekitike, ruled out with a long-term Achilles injury.", start:true, x:75, y:20, tags:["value"],
+    stat:"15 goals, 4 assists — 19 goal contributions last season", risk:"Chelsea's early fixtures are respectable rather than outstanding.",
+    detail:"João Pedro was the standout replacement once Ekitike was ruled out for months with an Achilles injury — he was one of Chelsea's brightest performers last season even in a disappointing team campaign, and he now plays under a new manager in Xabi Alonso who inherits a squad with more attacking talent around him. Weighed against the other names in this exact price bracket (Gyökeres, Havertz, Bowen), his combination of proven output and lower rotation risk made him the clearest value pick — not the flashiest name, but the best-supported one by actual last-season numbers."},
 ];
 
 const CHIPS = [
   {gw:1, label:"GW1: no chip"},
   {gw:3, label:"TC window opens"},
   {gw:7, label:"WC window opens"},
+];
+
+// --- Weekly Best XI, GW1-6 ---
+// GW1-3 fixtures are confirmed from the released 2026/27 schedule. GW4-6 use
+// directional fixture difficulty rather than confirmed opponents, flagged as such.
+const WEEKLY = [
+  {
+    gw:1, dateLabel:"Aug 21-24",
+    fixtures:[
+      {team:"Man City", opp:"Bournemouth (H)", diff:"easy"},
+      {team:"Arsenal", opp:"Coventry City (H)", diff:"easy"},
+      {team:"Man Utd", opp:"Hull City (A)", diff:"easy"},
+      {team:"Aston Villa", opp:"Brighton (A)", diff:"hard"},
+      {team:"Liverpool", opp:"Newcastle (A)", diff:"hard"},
+      {team:"Chelsea", opp:"Fulham (A)", diff:""},
+      {team:"Leeds", opp:"Nott'm Forest (A)", diff:"hard"},
+    ],
+    captain:"Erling Haaland",
+    reasoning:"Opening-day squad, unchanged from your 15. Haaland gets the armband on the back of a home tie against a Bournemouth side facing a tricky trip to the Etihad on their own first day, and Man Utd's Hull away, Arsenal's Coventry home tie make Bruno and the Arsenal trio auto-starts too. The nervier fixtures are Liverpool at Newcastle, Villa away at Brighton, and — worth calling out directly — Calvert-Lewin's Leeds away at Nottingham Forest, one of the tougher matchups on the board this week, not an easy one. Gross's Brighton fixture (Villa at home) isn't clean either, so there's no better forward-tier option to bring in this week — both start on reputation and role security rather than the matchup. This is a week to keep expectations modest on those three rather than a week to bench them.",
+    xi:{
+      GK:["Emiliano Martínez"],
+      DEF:["Gabriel","Matty Cash","Ezri Konsa"],
+      MID:["Bukayo Saka","Declan Rice","Bruno Fernandes","Dominik Szoboszlai"],
+      FWD:["Erling Haaland (C)","Dominic Calvert-Lewin","João Pedro"]
+    },
+    bench:["Backup GK","Joachim Andersen","Neco Williams","Pascal Gross"]
+  },
+  {
+    gw:2, dateLabel:"Aug 28-31",
+    fixtures:[
+      {team:"Man City", opp:"Crystal Palace (A)", diff:"hard"},
+      {team:"Man Utd", opp:"Ipswich Town (H)", diff:"easy"},
+      {team:"Arsenal", opp:"Aston Villa (A)", diff:""},
+      {team:"Aston Villa", opp:"Arsenal (H)", diff:"hard"},
+      {team:"Chelsea", opp:"Brighton (H)", diff:"easy"},
+      {team:"Fulham", opp:"Sunderland (A)", diff:""},
+      {team:"Leeds", opp:"Brentford (H)", diff:""}
+    ],
+    captain:"Bruno Fernandes",
+    reasoning:"Captaincy moves off Haaland this week — Man City travel to a Crystal Palace side fresh off a Conference League win and full of confidence, while Man Utd get a kind home tie against promoted Ipswich. Villa hosting Arsenal is a tough defensive test for Cash and Konsa; Konsa makes way for Andersen, whose Fulham side get a more workable trip to Sunderland. Everyone else holds — no fixture is bad enough yet to justify breaking up the rest of the XI.",
+    xi:{
+      GK:["Emiliano Martínez"],
+      DEF:["Gabriel","Matty Cash","Joachim Andersen"],
+      MID:["Bukayo Saka","Declan Rice","Bruno Fernandes (C)","Dominik Szoboszlai"],
+      FWD:["Erling Haaland","Dominic Calvert-Lewin","João Pedro"]
+    },
+    bench:["Backup GK","Ezri Konsa","Neco Williams","Pascal Gross"]
+  },
+  {
+    gw:3, dateLabel:"Sep 5",
+    fixtures:[
+      {team:"Man Utd", opp:"Man City (H)", diff:"hard"},
+      {team:"Man City", opp:"Man Utd (A)", diff:"hard"},
+      {team:"Arsenal", opp:"Chelsea (H)", diff:"hard"},
+      {team:"Chelsea", opp:"Arsenal (A)", diff:"hard"},
+      {team:"Brighton", opp:"Leeds (H)", diff:"easy"},
+      {team:"Leeds", opp:"Brighton (A)", diff:"hard"},
+    ],
+    captain:"Bukayo Saka",
+    reasoning:"The toughest week of the run so far — the Manchester derby neutralises both Haaland and Bruno as safe captaincy picks, since neither side is a soft touch for the other. Arsenal hosting Chelsea is also a genuine test, but Saka's underlying numbers and Arsenal's home platform still make him the safest armband of a bad week for captaincy options. Calvert-Lewin's Leeds travel to Brighton, their toughest fixture of the run — he stays in on reputation and penalty duties, but it's the one start this week you'd flag as shakiest.",
+    xi:{
+      GK:["Emiliano Martínez"],
+      DEF:["Gabriel","Matty Cash","Joachim Andersen"],
+      MID:["Bukayo Saka (C)","Declan Rice","Bruno Fernandes","Dominik Szoboszlai"],
+      FWD:["Erling Haaland","Dominic Calvert-Lewin","João Pedro"]
+    },
+    bench:["Backup GK","Ezri Konsa","Neco Williams","Pascal Gross"]
+  },
+  {
+    gw:4, dateLabel:"~Sep 12",
+    outlook:true,
+    fixtures:[
+      {team:"Man Utd", opp:"favorable window continues", diff:"easy"},
+      {team:"Sunderland (opp. context)", opp:"Arsenal host Sunderland-tier form", diff:""},
+      {team:"Leeds", opp:"Newcastle (H) — one of their better fixtures", diff:""},
+    ],
+    captain:"Erling Haaland",
+    reasoning:"Official fixtures this far out weren't fully confirmed in what's verifiable right now, so treat this week as directional rather than locked. Broad fixture-difficulty models still favour Man Utd and Arsenal through this stretch, and Leeds get one of their few kind home fixtures of the opening run — which is the best case yet for giving Calvert-Lewin's minutes more confidence. No squad changes suggested yet; re-check this section once GW4 fixtures are officially live.",
+    xi:{
+      GK:["Emiliano Martínez"],
+      DEF:["Gabriel","Matty Cash","Joachim Andersen"],
+      MID:["Bukayo Saka","Declan Rice","Bruno Fernandes","Dominik Szoboszlai"],
+      FWD:["Erling Haaland (C)","Dominic Calvert-Lewin","João Pedro"]
+    },
+    bench:["Backup GK","Ezri Konsa","Neco Williams","Pascal Gross"]
+  },
+  {
+    gw:5, dateLabel:"~Sep 19",
+    outlook:true,
+    fixtures:[
+      {team:"Man City", opp:"home vs Sunderland — favourable", diff:"easy"},
+      {team:"Liverpool", opp:"Iraola returns to Bournemouth (A)", diff:""},
+      {team:"Leeds", opp:"Crystal Palace (H)", diff:""},
+    ],
+    captain:"Erling Haaland",
+    reasoning:"Another directional week — City's home fixture against Sunderland looks like the standout captaincy option based on general form and home advantage, which is why the armband swings back to Haaland here. This is also around the international break, so double-check for any knocks picked up on international duty before finalising your XI. No structural squad changes flagged yet.",
+    xi:{
+      GK:["Emiliano Martínez"],
+      DEF:["Gabriel","Matty Cash","Joachim Andersen"],
+      MID:["Bukayo Saka","Declan Rice","Bruno Fernandes","Dominik Szoboszlai"],
+      FWD:["Erling Haaland (C)","Dominic Calvert-Lewin","João Pedro"]
+    },
+    bench:["Backup GK","Ezri Konsa","Neco Williams","Pascal Gross"]
+  },
+  {
+    gw:6, dateLabel:"~Sep 26",
+    outlook:true,
+    fixtures:[
+      {team:"Arsenal", opp:"Leeds United (H) — kind bookend fixture", diff:"easy"},
+      {team:"Leeds", opp:"Arsenal (A) — toughest of their run", diff:"hard"},
+      {team:"Everton", opp:"Hull City (A)", diff:"easy"},
+    ],
+    captain:"Bukayo Saka",
+    reasoning:"Arsenal close the opening stretch with a genuinely soft home fixture against Leeds, which is the best individual matchup in your whole squad this week — captaincy swings to Saka. On the flip side, this is Leeds' toughest match of the run, so Calvert-Lewin is the one player worth watching for a potential bench swap if his form has been quiet through GW1-5. Re-confirm this whole week once the actual fixture list for this far out is locked.",
+    xi:{
+      GK:["Emiliano Martínez"],
+      DEF:["Gabriel","Matty Cash","Joachim Andersen"],
+      MID:["Bukayo Saka (C)","Declan Rice","Bruno Fernandes","Dominik Szoboszlai"],
+      FWD:["Erling Haaland","Dominic Calvert-Lewin","João Pedro"]
+    },
+    bench:["Backup GK","Ezri Konsa","Neco Williams","Pascal Gross"]
+  },
 ];
 
 // --- Budget strip ---
@@ -613,7 +1151,20 @@ function renderGrid(filter){
       <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(avgPts/maxPts)*100)}%"></div></div>
       <div class="card-why">${p.why}</div>
       <div class="status-row">${(p.tags||[]).map(t=>`<span class="tag ${t}">${t}</span>`).join('')}</div>
+      <button class="expand-btn" type="button">Full breakdown <span class="arrow">▾</span></button>
+      <div class="card-detail">
+        ${p.stat ? `<span class="stat-line">▲ ${p.stat}</span>` : ''}
+        ${p.detail || ''}
+        ${p.risk ? `<span class="risk-line">⚠ ${p.risk}</span>` : ''}
+      </div>
     `;
+    const btn = card.querySelector('.expand-btn');
+    const panel = card.querySelector('.card-detail');
+    btn.addEventListener('click', ()=>{
+      panel.classList.toggle('open');
+      btn.classList.toggle('open');
+      btn.firstChild.textContent = panel.classList.contains('open') ? 'Hide breakdown ' : 'Full breakdown ';
+    });
     grid.appendChild(card);
   });
 }
@@ -625,6 +1176,61 @@ document.querySelectorAll('.pill').forEach(pill=>{
     pill.classList.add('active');
     renderGrid(pill.dataset.filter);
   });
+});
+
+// --- Weekly Best XI ---
+const gwTabs = document.getElementById('gwTabs');
+const gwPanels = document.getElementById('gwPanels');
+
+WEEKLY.forEach((wk, i)=>{
+  const tab = document.createElement('button');
+  tab.className = 'gw-tab' + (i===0 ? ' active' : '');
+  tab.textContent = 'GW' + wk.gw;
+  tab.dataset.gw = wk.gw;
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.gw-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.gw-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-gw'+wk.gw).classList.add('active');
+  });
+  gwTabs.appendChild(tab);
+
+  const panel = document.createElement('div');
+  panel.className = 'gw-panel' + (i===0 ? ' active' : '');
+  panel.id = 'panel-gw' + wk.gw;
+
+  const posOrder = ['GK','DEF','MID','FWD'];
+  const colsHtml = posOrder.map(pos=>{
+    const players = wk.xi[pos] || [];
+    const playersHtml = players.map(name=>{
+      const isCap = name.includes('(C)');
+      const cleanName = name.replace(' (C)','');
+      return `
+        <div class="xi-player${isCap?' captain':''}">
+          <div class="xi-name">${isCap?'<span class="cap-icon">C</span>':''}${cleanName}</div>
+        </div>`;
+    }).join('');
+    return `<div><div class="xi-col-label">${pos}</div>${playersHtml}</div>`;
+  }).join('');
+
+  const fixturesHtml = (wk.fixtures||[]).map(f=>
+    `<span class="fixture-chip ${f.diff||''}">${f.team} · ${f.opp}</span>`
+  ).join('');
+
+  panel.innerHTML = `
+    <div class="gw-head">
+      <div class="gw-title">Gameweek ${wk.gw}${wk.outlook ? ' — outlook' : ''}</div>
+      <div class="gw-captain-badge">Captain: ${wk.captain}</div>
+    </div>
+    <p class="gw-reasoning">${wk.reasoning}</p>
+    <div class="fixture-row">${fixturesHtml}</div>
+    <div class="xi-columns">${colsHtml}</div>
+    <div class="bench-row">
+      <span class="bench-label">Bench</span>
+      ${wk.bench.map(b=>`<span class="bench-chip">${b}</span>`).join('')}
+    </div>
+  `;
+  gwPanels.appendChild(panel);
 });
 
 // --- Chip timeline ---
@@ -642,6 +1248,120 @@ CHIPS.forEach(c=>{
   node.setAttribute('data-label', c.label);
   node.style.left = ((c.gw-1)/9*100) + '%';
   track.appendChild(node);
+});
+
+// --- Transfer Contingency Board ---
+const CONTINGENCIES = [
+  {
+    trigger:"Szoboszlai loses his starting spot or plays right-back",
+    from:"Szoboszlai", to:"Pascal Gross (already owned)",
+    why:"Gross is your cheapest MID cover and slots straight in — no transfer needed if this is short-term. If it's a longer-term role change, look at a nailed Liverpool alternative or a different club's set-piece midfielder in the £6-7m range."
+  },
+  {
+    trigger:"Calvert-Lewin loses penalty duty or his starting spot at Leeds",
+    from:"Calvert-Lewin", to:"reassess forward budget entirely",
+    why:"His whole case rests on nailed minutes + penalties at a cheap price. If either goes, he's no longer earning his spot over a pure squad-filler — worth actively shopping a replacement rather than holding."
+  },
+  {
+    trigger:"Gabriel or Saka picks up an injury",
+    from:"Gabriel / Saka", to:"no clean like-for-like — expect a points dip",
+    why:"Both are the highest-conviction picks in this squad precisely because they're hard to replace. Don't panic-sell into a short-term knock; wait for a specific return timeline before acting."
+  },
+  {
+    trigger:"Haaland is rested or rotated for a cup fixture",
+    from:"Haaland (captain)", to:"Bruno Fernandes (vice-captain)",
+    why:"This is exactly why Bruno holds the armband as backup — always check the captain's confirmed starting status before locking your team, especially around midweek European fixtures."
+  },
+  {
+    trigger:"Andersen or Williams loses their bench role to a rotation",
+    from:"Andersen / Williams", to:"any nailed £4.0-4.5m defender with a winnable run",
+    why:"These are pure value picks with no emotional attachment — if a club news update shows a cleaner starter at the same price, swap without hesitation."
+  },
+  {
+    trigger:"A double or blank gameweek is announced",
+    from:"—", to:"re-check chip timing (Free Hit / Bench Boost)",
+    why:"Both chips are explicitly being saved for exactly this scenario. A confirmed DGW or BGW should immediately reopen the chip conversation regardless of where you are in the season."
+  },
+];
+
+const contGrid = document.getElementById('contingencyGrid');
+CONTINGENCIES.forEach(c=>{
+  const card = document.createElement('div');
+  card.className = 'cont-card';
+  card.innerHTML = `
+    <div class="cont-trigger">⚠ If: ${c.trigger}</div>
+    <div class="cont-arrow">${c.from} <span class="to">→ ${c.to}</span></div>
+    <div class="cont-why">${c.why}</div>
+  `;
+  contGrid.appendChild(card);
+});
+
+// --- AI Assistant ---
+const suggestions = [
+  "Szoboszlai just got ruled out for 3 weeks — who should I bring in?",
+  "Gabriel is a doubt for GW1 — does that change anything?",
+  "I lost my GW1 — should I use my wildcard early?",
+  "Is there a better captain option than Haaland this week?",
+];
+const suggWrap = document.getElementById('assistantSuggestions');
+suggestions.forEach(s=>{
+  const chip = document.createElement('button');
+  chip.className = 'sugg-chip';
+  chip.type = 'button';
+  chip.textContent = s.length > 46 ? s.slice(0,44)+'…' : s;
+  chip.title = s;
+  chip.addEventListener('click', ()=>{ input.value = s; input.focus(); });
+  suggWrap.appendChild(chip);
+});
+
+const log = document.getElementById('assistantLog');
+const input = document.getElementById('assistantInput');
+const sendBtn = document.getElementById('assistantSend');
+
+function addMsg(role, text){
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+async function sendMessage(){
+  const text = input.value.trim();
+  if(!text) return;
+  addMsg('user', text);
+  input.value = '';
+  sendBtn.disabled = true;
+  const thinking = addMsg('assistant', 'Thinking…');
+
+  try{
+    const res = await fetch('/api/assistant', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    thinking.remove();
+    if(!res.ok){
+      addMsg('error', data.error || 'Something went wrong.');
+    } else {
+      addMsg('assistant', data.reply);
+    }
+  } catch(err){
+    thinking.remove();
+    addMsg('error', 'Could not reach the assistant — check your connection and try again.');
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+input.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
 });
 </script>
 
