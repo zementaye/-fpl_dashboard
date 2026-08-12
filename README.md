@@ -35,3 +35,18 @@ Render also connects to GitLab and Bitbucket repos if you don't want to use GitH
 ## Updating the data later
 
 All the squad data lives in the `PLAYERS` array near the bottom of `public/index.html` — edit prices, projected points, or the `why` text there, push the change to your repo, and Render will auto-redeploy.
+
+## Setting up the AI Assistant
+
+The dashboard includes an "Ask" panel that calls Google Gemini to react to injury news, transfers, or bad gameweeks against your actual squad — Gemini's free tier (no credit card required) is enough to run this. To make it work on your deployed Render service:
+
+1. Go to [aistudio.google.com](https://aistudio.google.com), sign in with a Google account, and click **Get API key** → **Create API key**. No credit card needed.
+2. In your Render dashboard, open your web service → **Environment** tab.
+3. Add an environment variable: **Key** = `GEMINI_API_KEY`, **Value** = your key.
+4. Save — Render will automatically redeploy with the key available.
+
+The key never touches the browser — `server.js` keeps it server-side and only exposes a `/api/assistant` endpoint that the page calls. Without this step, the Ask panel will show a clear error explaining the key is missing rather than failing silently.
+
+Google's free tier has rate limits (requests per minute/day) — plenty for personal use, but if you hit a 429 error, wait a minute and try again.
+
+If you'd rather skip API keys entirely, the **Transfer Contingency Board** section covers the most likely "what if" scenarios (injuries, role changes, chip timing) without needing the AI panel at all.
