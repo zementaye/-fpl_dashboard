@@ -37,6 +37,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // ─────────────────────────────────────────────────────────────
+// Basic rate limiting — protects the Gemini free-tier quota (and
+// the FPL API) from being hammered by one visitor. In-memory only,
+// no dependency needed for a single-instance personal deployment.
+// ─────────────────────────────────────────────────────────────
+const rateBuckets = new Map(); // ip -> [timestamps]
+
+function rateLimit({ windowMs, max }) {
+  return (req, res, next) => {
+    const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const key = ip + ':' + req.path;
+    const timestamps = (rateBuckets.get(key) || []).filter(t => now - t < windowMs);
+    if (timestamps.length >= max) {
+      const retryAfterSec = Math.ceil((windowMs - (now - timestamps[0])) / 1000);
+      res.set('Retry-After', String(retryAfterSec));
+      return res.status(429).json({ error: `Too many requests — try again in about ${retryAfterSec}s.` });
+    }
+    timestamps.push(now);
+    rateBuckets.set(key, timestamps);
+    next();
+  };
+}
+
+// Periodic cleanup so the map doesn't grow forever
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamps] of rateBuckets.entries()) {
+    const fresh = timestamps.filter(t => now - t < 60 * 60 * 1000);
+    if (fresh.length) rateBuckets.set(key, fresh); else rateBuckets.delete(key);
+  }
+}, 15 * 60 * 1000);
+
+// ─────────────────────────────────────────────────────────────
 // AI Assistant — Google Gemini, key stays server-side
 // ─────────────────────────────────────────────────────────────
 const SQUAD_CONTEXT = `
@@ -44,10 +77,10 @@ You are a Fantasy Premier League (FPL) transfer and lineup assistant for a speci
 user's 2026/27 season squad. Answer only using football/FPL knowledge relevant to
 the question, be concise, and always end with a clear recommendation.
 
-CURRENT 15-MAN SQUAD (£100.0m):
+CURRENT 15-MAN SQUAD (£102.5m, ~£2.5m over the standard £100m budget with confirmed prices):
 GK: Emiliano Martínez (Aston Villa, £5.0m) | Backup GK (£4.0m)
 DEF: Gabriel (Arsenal, £8.0m) | Matty Cash (Aston Villa, £4.0m) | Ezri Konsa (Aston Villa, £4.0m) | Joachim Andersen (Fulham, £4.0m) | Neco Williams (Nott'm Forest, £4.0m)
-MID: Bukayo Saka (Arsenal, £9.5m) | Declan Rice (Arsenal, £7.5m) | Bruno Fernandes (Man Utd, £10.0m) | Dominik Szoboszlai (Liverpool, £6.5m) | Pascal Gross (Brighton, £4.5m)
+MID: Bukayo Saka (Arsenal, £9.5m) | Declan Rice (Arsenal, £7.5m) | Bruno Fernandes (Man Utd, £12.0m, confirmed official price) | Dominik Szoboszlai (Liverpool, £7.0m, confirmed official price) | Pascal Gross (Brighton, £4.5m)
 FWD: Erling Haaland (Man City, £15.5m, captain) | Dominic Calvert-Lewin (Leeds, £6.0m) | João Pedro (Chelsea, £7.5m)
 
 Known context: Andersen replaced Marcos Senesi after Senesi moved to Tottenham.
@@ -67,7 +100,7 @@ gameweek), incorporate it and suggest what to do about it — a transfer target,
 a captaincy change, or a formation/bench swap — with brief reasoning.
 `.trim();
 
-app.post('/api/assistant', async (req, res) => {
+app.post('/api/assistant', rateLimit({ windowMs: 10 * 60 * 1000, max: 15 }), async (req, res) => {
   const userMessage = (req.body && req.body.message || '').toString().slice(0, 2000);
   if (!userMessage.trim()) {
     return res.status(400).json({ error: 'Message is required.' });
@@ -153,7 +186,7 @@ const STATUS_LABELS = {
 let fplCache = { data: null, fetchedAt: 0 };
 const CACHE_MS = 10 * 60 * 1000; // 10 minutes
 
-app.get('/api/fpl-data', async (req, res) => {
+app.get('/api/fpl-data', rateLimit({ windowMs: 60 * 1000, max: 20 }), async (req, res) => {
   try {
     const now = Date.now();
     let bootstrap;
