@@ -1,14 +1,44 @@
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ─────────────────────────────────────────────────────────────
+// Optional password gate — only active if SITE_PASSWORD is set.
+// Uses HTTP Basic Auth (browser shows a native login prompt).
+// Username can be anything; only the password is checked.
+// ─────────────────────────────────────────────────────────────
+function timingSafeEqual(a, b) {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+app.use((req, res, next) => {
+  const sitePassword = process.env.SITE_PASSWORD;
+  if (!sitePassword) return next(); // no password set = site stays open
+
+  const header = req.headers.authorization || '';
+  const [scheme, encoded] = header.split(' ');
+  if (scheme === 'Basic' && encoded) {
+    const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+    const idx = decoded.indexOf(':');
+    const pass = idx >= 0 ? decoded.slice(idx + 1) : '';
+    if (timingSafeEqual(pass, sitePassword)) return next();
+  }
+  res.set('WWW-Authenticate', 'Basic realm="FPL Dashboard"');
+  res.status(401).send('Authentication required.');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Squad context the assistant uses to ground its answers.
-// Keep this in sync with the PLAYERS array in public/index.html.
+// ─────────────────────────────────────────────────────────────
+// AI Assistant — Google Gemini, key stays server-side
+// ─────────────────────────────────────────────────────────────
 const SQUAD_CONTEXT = `
 You are a Fantasy Premier League (FPL) transfer and lineup assistant for a specific
 user's 2026/27 season squad. Answer only using football/FPL knowledge relevant to
@@ -27,6 +57,10 @@ Calvert-Lewin's GW1 fixture (away at Nottingham Forest) is a tough opener, but h
 starts anyway since the squad rules fix forwards at exactly 3 (no bench forward).
 Squad formation is typically 3-4-3, with 3-5-2/4-4-2 as fallback formations to
 bench a forward with a bad fixture in favor of Gross (MID) or Williams (DEF).
+
+The user may also tell you about edits they've made in the dashboard's own "Edit
+Squad" panel (a player swapped for someone else, a note added) — treat anything
+they tell you about their current squad as more up to date than the list above.
 
 When the user mentions news (an injury, a transfer, a lineup change, a bad
 gameweek), incorporate it and suggest what to do about it — a transfer target,
@@ -77,6 +111,104 @@ app.post('/api/assistant', async (req, res) => {
   } catch (err) {
     console.error('Assistant request failed:', err);
     res.status(500).json({ error: 'Something went wrong reaching the assistant.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// Live FPL data — proxies the official public FPL API server-side
+// (browsers get blocked by CORS hitting it directly) and matches
+// it against our 15-man squad by name + team.
+// ─────────────────────────────────────────────────────────────
+
+// key = the exact player name used in the dashboard's PLAYERS array
+const SQUAD_LOOKUP = [
+  { key: 'Emiliano Martínez', team: 'Aston Villa', surnames: ['martinez'] },
+  { key: 'Gabriel', team: 'Arsenal', surnames: ['gabriel', 'magalhaes'] },
+  { key: 'Matty Cash', team: 'Aston Villa', surnames: ['cash'] },
+  { key: 'Ezri Konsa', team: 'Aston Villa', surnames: ['konsa'] },
+  { key: 'Joachim Andersen', team: 'Fulham', surnames: ['andersen'] },
+  { key: 'Neco Williams', team: "Nott'm Forest", surnames: ['williams'] },
+  { key: 'Bukayo Saka', team: 'Arsenal', surnames: ['saka'] },
+  { key: 'Declan Rice', team: 'Arsenal', surnames: ['rice'] },
+  { key: 'Bruno Fernandes', team: 'Man Utd', surnames: ['fernandes'] },
+  { key: 'Dominik Szoboszlai', team: 'Liverpool', surnames: ['szoboszlai'] },
+  { key: 'Pascal Gross', team: 'Brighton', surnames: ['gross', 'gro'] },
+  { key: 'Erling Haaland', team: 'Man City', surnames: ['haaland'] },
+  { key: 'Dominic Calvert-Lewin', team: 'Leeds', surnames: ['calvertlewin'] },
+  { key: 'João Pedro', team: 'Chelsea', surnames: ['pedro'] },
+];
+
+function normalize(str) {
+  return (str || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip accents
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+const STATUS_LABELS = {
+  a: 'Available', d: 'Doubtful', i: 'Injured',
+  s: 'Suspended', u: 'Unavailable', n: 'Not in squad',
+};
+
+let fplCache = { data: null, fetchedAt: 0 };
+const CACHE_MS = 10 * 60 * 1000; // 10 minutes
+
+app.get('/api/fpl-data', async (req, res) => {
+  try {
+    const now = Date.now();
+    let bootstrap;
+    if (fplCache.data && (now - fplCache.fetchedAt) < CACHE_MS) {
+      bootstrap = fplCache.data;
+    } else {
+      const r = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/');
+      if (!r.ok) throw new Error('FPL API returned ' + r.status);
+      bootstrap = await r.json();
+      fplCache = { data: bootstrap, fetchedAt: now };
+    }
+
+    const teamsById = {};
+    (bootstrap.teams || []).forEach(t => { teamsById[t.id] = t.name; });
+
+    const matched = {};
+    SQUAD_LOOKUP.forEach(entry => {
+      const candidates = (bootstrap.elements || []).filter(el => {
+        const teamName = teamsById[el.team] || '';
+        const teamMatch = normalize(teamName).includes(normalize(entry.team.replace("Nott'm", 'Nottingham')))
+          || normalize(entry.team).includes(normalize(teamName))
+          || normalize(teamName) === normalize(entry.team);
+        if (!teamMatch) return false;
+        const hay = normalize(el.web_name + el.first_name + el.second_name);
+        return entry.surnames.some(s => hay.includes(normalize(s)));
+      });
+      if (candidates.length) {
+        const el = candidates[0];
+        matched[entry.key] = {
+          price: el.now_cost / 10,
+          status: el.status,
+          statusLabel: STATUS_LABELS[el.status] || el.status,
+          news: el.news || '',
+          chanceNextRound: el.chance_of_playing_next_round,
+          selectedByPercent: el.selected_by_percent,
+          formPoints: el.form,
+          totalPoints: el.total_points,
+        };
+      }
+    });
+
+    const events = bootstrap.events || [];
+    const nextEvent = events.find(e => e.is_next) || events.find(e => !e.finished);
+
+    res.json({
+      players: matched,
+      matchedCount: Object.keys(matched).length,
+      expectedCount: SQUAD_LOOKUP.length,
+      nextDeadline: nextEvent ? nextEvent.deadline_time : null,
+      currentGameweek: nextEvent ? nextEvent.id : null,
+      fetchedAt: fplCache.fetchedAt,
+    });
+  } catch (err) {
+    console.error('FPL data fetch failed:', err);
+    res.status(502).json({ error: 'Could not reach the live FPL API right now.' });
   }
 });
 
