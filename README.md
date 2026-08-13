@@ -1,81 +1,78 @@
-# FPL Dashboard — Render Deploy
+# FPL Squad Dashboard
 
-Render only deploys from a Git repo, not a direct file upload — so the fastest path is:
+A self-hosted Fantasy Premier League dashboard: a tactical pitch view of your starting XI, per-player reasoning for every pick, a week-by-week best-XI planner, a chip-strategy timeline, live price/injury data pulled from the official FPL API, and an optional AI assistant for reacting to news mid-season.
 
-## Option A: GitHub → Render (recommended, ~2 min)
+It's a single Node/Express server serving a static dashboard — no database, no build step, deploys to [Render](https://render.com)'s free tier in a couple of minutes.
 
-1. Unzip this folder locally.
-2. Create a new **public** GitHub repo and push these files to it:
-   ```
-   git init
-   git add .
-   git commit -m "FPL dashboard"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/<repo-name>.git
-   git push -u origin main
-   ```
-3. Go to [render.com](https://render.com) → **New +** → **Web Service**.
-4. Connect the repo you just pushed.
-5. Render should auto-detect the settings from `render.yaml`. If not, set manually:
+## Features
+
+- **Tactical pitch diagram** — starting XI plotted on a pitch, click a player to jump to their card
+- **Full squad breakdown** — price, projected points, and an expandable "why this pick" writeup per player, with underlying stats and risk flags
+- **Weekly Best XI planner** — gameweek-by-gameweek captaincy and lineup reasoning based on fixtures
+- **Chip strategy timeline** — Wildcard / Free Hit / Triple Captain / Bench Boost timing guidance
+- **Transfer Contingency Board** — pre-planned "if this happens → do this" reactions for the squad's riskiest picks
+- **Live FPL data** — server-side proxy to the official FPL API for real prices, injury status, and the next gameweek deadline, matched automatically against the squad
+- **Editable squad** — update a player's name, price, or add a note directly in the UI, no code changes needed (saved locally in your browser)
+- **AI Assistant** *(optional)* — a chat panel backed by Google Gemini that reasons about transfers and captaincy against the current squad, useful for reacting to injury news between updates
+- **Optional password gate** — lock the whole site behind a single shared password
+
+## Tech stack
+
+- Node.js + Express (single server, serves the static frontend and two small API routes)
+- Vanilla HTML/CSS/JS on the frontend — no build step, no framework
+- [Official FPL API](https://fantasy.premierleague.com/api/bootstrap-static/) for live data
+- [Google Gemini API](https://ai.google.dev/) for the optional AI assistant
+
+## Project structure
+
+```
+.
+├── public/
+│   └── index.html      # the dashboard itself — data, layout, and logic all in one file
+├── server.js            # Express server: static hosting + /api/fpl-data + /api/assistant
+├── package.json
+└── render.yaml           # lets Render auto-configure the service
+```
+
+## Running locally
+
+```
+npm install
+npm start
+```
+
+Then open `http://localhost:3000`. The live FPL data and squad editing work out of the box with no setup; the AI Assistant needs an API key (see below).
+
+## Deploying to Render
+
+1. Fork or clone this repo.
+2. On [render.com](https://render.com): **New +** → **Web Service** → connect your repo.
+3. Render should auto-detect everything from `render.yaml`. If not, set manually:
    - **Build Command:** `npm install`
    - **Start Command:** `npm start`
-6. Click **Create Web Service**. Your dashboard will be live at `https://<your-service-name>.onrender.com` in a minute or two.
+4. Deploy. It'll be live at `https://<your-service-name>.onrender.com` within a minute or two.
 
-## Option B: Skip GitHub — GitLab/Bitbucket work the same way
+Any other Node-friendly host (Railway, Fly.io, Vercel, a VPS) works the same way — the app is a standard Express server, nothing Render-specific about it.
 
-Render also connects to GitLab and Bitbucket repos if you don't want to use GitHub — same steps as above.
+## Environment variables
 
-## What's in here
+Both are optional — the dashboard runs with neither set, just with the AI Assistant and password gate disabled.
 
-- `public/index.html` — the dashboard itself (pitch diagram, squad cards, chip roadmap)
-- `server.js` — tiny Express server that serves the static file
-- `package.json` — dependencies (just Express)
-- `render.yaml` — lets Render auto-configure the service from this file
+| Variable | Required for | How to get one |
+|---|---|---|
+| `GEMINI_API_KEY` | The AI Assistant panel | Free at [aistudio.google.com](https://aistudio.google.com) — sign in, **Get API key** → **Create API key**, no credit card |
+| `SITE_PASSWORD` | Locking the site behind a login prompt | Any string you choose — set it directly as the env var value |
 
-## Updating the data later
+Set these under your host's environment/secrets settings (e.g. Render → your service → **Environment** tab). `GEMINI_API_KEY` never reaches the browser — `server.js` keeps it server-side behind a `/api/assistant` route.
 
-All the squad data lives in the `PLAYERS` array near the bottom of `public/index.html` — edit prices, projected points, or the `why` text there, push the change to your repo, and Render will auto-redeploy.
+## Customizing the squad
 
-## Setting up the AI Assistant
+Squad data lives in the `PLAYERS` array near the bottom of `public/index.html` — prices, projected points, and the reasoning text for each pick. Edit it directly and redeploy, or use the in-app **Edit** button on each card for quick changes without touching code (saved to that browser's local storage — not synced across devices, and doesn't propagate to the pitch diagram or Weekly XI panels, which are hand-written per gameweek).
 
-The dashboard includes an "Ask" panel that calls Google Gemini to react to injury news, transfers, or bad gameweeks against your actual squad — Gemini's free tier (no credit card required) is enough to run this. To make it work on your deployed Render service:
+## How the live data works
 
-1. Go to [aistudio.google.com](https://aistudio.google.com), sign in with a Google account, and click **Get API key** → **Create API key**. No credit card needed.
-2. In your Render dashboard, open your web service → **Environment** tab.
-3. Add an environment variable: **Key** = `GEMINI_API_KEY`, **Value** = your key.
-4. Save — Render will automatically redeploy with the key available.
+`server.js` proxies the official FPL bootstrap-static endpoint (browsers get blocked by CORS calling it directly), matches players by name + team against the hardcoded squad, and caches the result for 10 minutes. If a player can't be matched or the API is briefly unavailable, the dashboard falls back to its static estimates silently — nothing breaks.
 
-The key never touches the browser — `server.js` keeps it server-side and only exposes a `/api/assistant` endpoint that the page calls. Without this step, the Ask panel will show a clear error explaining the key is missing rather than failing silently.
+## License
 
-Google's free tier has rate limits (requests per minute/day) — plenty for personal use, but if you hit a 429 error, wait a minute and try again.
-
-If you'd rather skip API keys entirely, the **Transfer Contingency Board** section covers the most likely "what if" scenarios (injuries, role changes, chip timing) without needing the AI panel at all.
-
-## Live FPL prices, injuries, and deadline
-
-The dashboard automatically pulls live data from the official public FPL API on every page load — no setup, no API key needed for this part. It shows:
-
-- A green "live" dot + how many of your 15 squad players it successfully matched
-- A **live price tag** on each card if the official price differs from the estimate baked into the dashboard
-- A red **status flag** on any player who's flagged doubtful/injured/suspended in the official data, with the injury news text
-- A **deadline countdown chip** for the next gameweek
-
-This is fetched server-side (browsers get blocked by CORS hitting the FPL API directly) and cached for 10 minutes to avoid hammering it. If the FPL API is briefly down or a player can't be matched by name, the dashboard just falls back to showing the static estimate — nothing breaks.
-
-## Editing your squad without touching code
-
-Every player card has an **Edit** button — change the name, price, or add a note (e.g. "swapped for X after the injury"), and it's saved automatically. An "edited" badge appears on any player you've changed, and a **Reset all edits** button appears above the squad grid once you've made any changes.
-
-**Important scope note:** edits update the squad card display and get shared with the AI Assistant (so you can just tell it "I already swapped Szoboszlai for X" and it'll know). They do **not** automatically update the pitch diagram or the Weekly Best XI panels — those are hand-written for each gameweek, so a swap there still needs a manual edit to `public/index.html` if you want it reflected there too.
-
-**Storage note:** edits and chat history are saved in your browser's local storage, not on the server — they're private to you but tied to that specific browser/device. Clearing your browser data will reset them, and they won't show up if you open the dashboard on a different device.
-
-## Password-protecting the site
-
-By default your Render URL is public — anyone with the link can view your squad and use your AI Assistant (burning your Gemini quota). To lock it down:
-
-1. In Render: your service → **Environment** tab.
-2. Add an environment variable: **Key** = `SITE_PASSWORD`, **Value** = whatever password you want.
-3. Save — Render redeploys automatically.
-
-Visiting the site will now show your browser's native login prompt. The username can be anything; only the password is checked. Leave `SITE_PASSWORD` unset if you'd rather keep the site open.
+No license specified — treat as a personal project template. Fork and adapt freely.
