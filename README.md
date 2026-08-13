@@ -29,9 +29,11 @@ It's a single Node/Express server serving a static dashboard — no database, no
 .
 ├── public/
 │   └── index.html      # the dashboard itself — data, layout, and logic all in one file
-├── server.js            # Express server: static hosting + /api/fpl-data + /api/assistant
+├── server.js            # Express server: static hosting + /api/fpl-data + /api/assistant + rate limiting
 ├── package.json
-└── render.yaml           # lets Render auto-configure the service
+├── render.yaml           # lets Render auto-configure the service
+├── .gitignore
+└── LICENSE
 ```
 
 ## Running locally
@@ -75,4 +77,4 @@ Squad data lives in the `PLAYERS` array near the bottom of `public/index.html` �
 
 ## License
 
-No license specified — treat as a personal project template. Fork and adapt freely.
+MIT — see [LICENSE](./LICENSE). Fork and adapt freely.
