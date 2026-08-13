@@ -792,6 +792,123 @@
   }
   .sugg-chip:hover{ border-color:var(--gold-bright); color:var(--chalk); }
 
+  /* ===== LIVE DATA BADGE ===== */
+  .live-banner{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--chalk-dim);
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .live-dot{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--chalk-dim);
+    display:inline-block;
+  }
+  .live-dot.on{ background:#6fcf87; box-shadow:0 0 6px rgba(111,207,135,0.6); }
+  .live-dot.error{ background:#e08272; }
+  .deadline-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--gold-bright);
+    border:1px solid var(--gold-bright);
+    border-radius:999px;
+    padding:4px 12px;
+  }
+  .live-price-tag{
+    font-size:9.5px;
+    font-family:'IBM Plex Mono', monospace;
+    color:#6fcf87;
+    margin-left:6px;
+  }
+  .live-status-flag{
+    display:inline-block;
+    margin-top:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    padding:3px 8px;
+    border-radius:4px;
+    background:rgba(193,80,63,0.18);
+    color:#e08272;
+  }
+
+  /* ===== EDIT SQUAD ===== */
+  .edit-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:4px 9px;
+    border-radius:4px;
+    cursor:pointer;
+    margin-left:auto;
+  }
+  .edit-btn:hover{ border-color:var(--gold-bright); color:var(--chalk); }
+  .edit-form{
+    display:none;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    gap:8px;
+    flex-direction:column;
+  }
+  .edit-form.open{ display:flex; }
+  .edit-form input{
+    background:var(--turf-dark);
+    border:1px solid var(--line);
+    border-radius:5px;
+    color:var(--chalk);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px;
+    padding:7px 9px;
+  }
+  .edit-form input:focus{ outline:none; border-color:var(--gold-bright); }
+  .edit-form-row{ display:flex; gap:8px; }
+  .edit-form-actions{ display:flex; gap:8px; margin-top:2px; }
+  .edit-form-actions button{
+    flex:1;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding:8px;
+    border-radius:5px;
+    cursor:pointer;
+    border:1px solid var(--line);
+  }
+  .edit-save{ background:var(--gold-bright); color:var(--turf-dark); border-color:var(--gold-bright) !important; font-weight:600; }
+  .edit-reset{ background:transparent; color:var(--chalk-dim); }
+  .edited-badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    color:var(--gold-bright);
+    border:1px solid var(--gold-bright);
+    border-radius:4px;
+    padding:2px 6px;
+    margin-left:6px;
+  }
+  .reset-all-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--chalk-dim);
+    background:none;
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:6px 12px;
+    cursor:pointer;
+    margin-bottom:18px;
+  }
+  .reset-all-btn:hover{ border-color:#e08272; color:#e08272; }
+
   footer{
     max-width:1100px;
     margin:64px auto 0;
@@ -817,6 +934,11 @@
     <p class="hero-sub">Your 15-man squad, projected points, and the reasoning behind every pick — built from live prices, expert fixture models, and last season's underlying numbers.</p>
 
     <div class="budget-strip" id="budgetStrip"></div>
+    <div class="live-banner" id="liveBanner">
+      <span class="live-dot" id="liveDot"></span>
+      <span id="liveStatusText">Loading live FPL data…</span>
+      <span class="deadline-chip" id="deadlineChip" style="display:none;"></span>
+    </div>
   </div>
 
   <div class="pitch-wrap">
@@ -832,6 +954,7 @@
       <h2>Full Squad</h2>
       <span class="count">15 players · £100.0m</span>
     </div>
+    <button class="reset-all-btn" id="resetAllBtn" style="display:none;">↺ Reset all edits to defaults</button>
     <div class="pills" id="pills">
       <button class="pill active" data-filter="all">All</button>
       <button class="pill" data-filter="GK">Keepers</button>
@@ -900,12 +1023,13 @@
       <span class="count">ask about news, injuries, transfers</span>
     </div>
     <div class="assistant-wrap">
-      <p class="assistant-hint">Tell it what's changed — an injury, a bad gameweek, a transfer rumor — and it'll factor it against your actual squad. <strong>Needs a <code>GEMINI_API_KEY</code> set in your Render service's Environment tab to work</strong> (free, no card needed) — see the README for the 2-minute setup.</p>
+      <p class="assistant-hint">Tell it what's changed — an injury, a bad gameweek, a transfer rumor — and it'll factor it against your actual squad. <strong>Needs a <code>GEMINI_API_KEY</code> set in your Render service's Environment tab to work</strong> (free, no card needed) — see the README for the 2-minute setup. Your conversation is saved in this browser only.</p>
       <div class="assistant-suggestions" id="assistantSuggestions"></div>
       <div class="assistant-log" id="assistantLog"></div>
       <div class="assistant-input-row">
         <textarea id="assistantInput" placeholder="e.g. Szoboszlai just got ruled out for 3 weeks — who should I bring in?" rows="1"></textarea>
         <button id="assistantSend" type="button">Ask</button>
+        <button id="clearChatBtn" type="button" title="Clear conversation" style="background:transparent; border:1px solid var(--line); color:var(--chalk-dim); padding:0 14px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:11px; cursor:pointer;">Clear</button>
       </div>
     </div>
   </section>
@@ -1140,37 +1264,135 @@ function flash(el){
   setTimeout(()=>{ el.style.borderColor = ''; }, 1200);
 }
 
+// --- Squad edits (persisted per-browser via localStorage) ---
+// Keyed by the ORIGINAL player name from PLAYERS, so edits survive re-renders.
+// Note: edits update the squad card (name/price/note) and are shared with the
+// AI Assistant. The pitch diagram and Weekly Best XI sections still reflect the
+// original planned squad — edit those weekly panels manually if a swap changes
+// your actual starting XI for a given week.
+const EDITS_KEY = 'fpl_squad_edits_v1';
+function loadEdits(){
+  try{ return JSON.parse(localStorage.getItem(EDITS_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function saveEdits(edits){
+  localStorage.setItem(EDITS_KEY, JSON.stringify(edits));
+}
+let squadEdits = loadEdits();
+
+function getEffectivePlayers(){
+  return PLAYERS.map(p=>{
+    const e = squadEdits[p.name];
+    if(!e) return p;
+    return {
+      ...p,
+      name: e.name || p.name,
+      price: (e.price !== undefined && e.price !== null && e.price !== '') ? parseFloat(e.price) : p.price,
+      editNote: e.note || '',
+      isEdited: true,
+      originalName: p.name,
+    };
+  });
+}
+
+function updateResetAllVisibility(){
+  const btn = document.getElementById('resetAllBtn');
+  btn.style.display = Object.keys(squadEdits).length ? 'inline-block' : 'none';
+}
+
+document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+  if(!confirm('Reset all squad edits back to the original defaults?')) return;
+  squadEdits = {};
+  saveEdits(squadEdits);
+  updateResetAllVisibility();
+  renderGrid(currentFilter);
+});
+
+// --- Live FPL data ---
+let liveData = null; // populated by fetchLiveData()
+
+async function fetchLiveData(){
+  const dot = document.getElementById('liveDot');
+  const statusText = document.getElementById('liveStatusText');
+  const deadlineChip = document.getElementById('deadlineChip');
+  try{
+    const res = await fetch('/api/fpl-data');
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Live data unavailable');
+    liveData = data;
+    dot.classList.add('on');
+    const stamp = data.fetchedAt ? new Date(data.fetchedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+    statusText.textContent = `Live prices matched for ${data.matchedCount}/${data.expectedCount} players${stamp ? ' · updated ' + stamp : ''}`;
+    if(data.nextDeadline){
+      const d = new Date(data.nextDeadline);
+      const now = new Date();
+      const diffMs = d - now;
+      const days = Math.floor(diffMs / (1000*60*60*24));
+      const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
+      deadlineChip.textContent = diffMs > 0
+        ? `GW${data.currentGameweek} deadline in ${days}d ${hours}h`
+        : `GW${data.currentGameweek} deadline passed`;
+      deadlineChip.style.display = 'inline-block';
+    }
+    renderGrid(currentFilter);
+  } catch(err){
+    dot.classList.add('error');
+    statusText.textContent = 'Live FPL data unavailable — showing pre-season estimates instead.';
+  }
+}
+
 // --- Squad grid ---
 const grid = document.getElementById('squadGrid');
+let currentFilter = 'all';
+
 function renderGrid(filter){
+  currentFilter = filter;
   grid.innerHTML = '';
-  PLAYERS.filter(p=>{
+  const effectivePlayers = getEffectivePlayers();
+  effectivePlayers.filter(p=>{
     if(filter==='all') return true;
     if(filter==='bench') return !p.start;
     return p.pos===filter;
   }).forEach(p=>{
     const maxPts = 50;
     const avgPts = p.pts.split('–').map(Number).reduce((a,b)=>a+b,0)/2 || 0;
+    const live = liveData && liveData.players[p.originalName || p.name];
     const card = document.createElement('div');
     card.className = 'card' + (!p.start ? ' bench' : '');
-    card.id = 'card-' + slug(p.name);
+    card.id = 'card-' + slug(p.originalName || p.name);
     card.innerHTML = `
       <div class="card-top">
         <div>
-          <div class="card-name">${p.name}${p.captain?'<span class="cap-tag">CAPTAIN</span>':''}</div>
+          <div class="card-name">${p.name}${p.captain?'<span class="cap-tag">CAPTAIN</span>':''}${p.isEdited?'<span class="edited-badge">edited</span>':''}</div>
           <div class="card-pos">${p.pos} · ${p.team}${p.start?'':' · bench'}</div>
         </div>
-        <div class="card-price">£${p.price.toFixed(1)}m</div>
+        <div class="card-price">£${p.price.toFixed(1)}m${live ? `<div class="live-price-tag">live: £${live.price.toFixed(1)}m</div>` : ''}</div>
       </div>
+      ${live && live.status !== 'a' ? `<div class="live-status-flag">⚠ ${live.statusLabel}${live.news ? ': ' + live.news : ''}</div>` : ''}
       <div class="card-pts"><div class="val">${p.pts}</div><div class="lbl">proj pts&nbsp;GW1–6</div></div>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(avgPts/maxPts)*100)}%"></div></div>
       <div class="card-why">${p.why}</div>
+      ${p.editNote ? `<div class="card-why" style="margin-top:6px; color:var(--gold-bright);">Note: ${p.editNote}</div>` : ''}
       <div class="status-row">${(p.tags||[]).map(t=>`<span class="tag ${t}">${t}</span>`).join('')}</div>
-      <button class="expand-btn" type="button">Full breakdown <span class="arrow">▾</span></button>
+      <div style="display:flex; align-items:center; margin-top:10px;">
+        <button class="expand-btn" type="button" style="margin-top:0;">Full breakdown <span class="arrow">▾</span></button>
+        <button class="edit-btn" type="button">Edit</button>
+      </div>
       <div class="card-detail">
         ${p.stat ? `<span class="stat-line">▲ ${p.stat}</span>` : ''}
         ${p.detail || ''}
         ${p.risk ? `<span class="risk-line">⚠ ${p.risk}</span>` : ''}
+      </div>
+      <div class="edit-form">
+        <div class="edit-form-row">
+          <input type="text" class="edit-name" placeholder="Player name" value="${p.name}">
+          <input type="number" step="0.1" class="edit-price" placeholder="Price £m" value="${p.price}">
+        </div>
+        <input type="text" class="edit-note" placeholder="Note (e.g. why you swapped this player)" value="${p.editNote || ''}">
+        <div class="edit-form-actions">
+          <button type="button" class="edit-save">Save</button>
+          <button type="button" class="edit-reset">Reset this player</button>
+        </div>
       </div>
     `;
     const btn = card.querySelector('.expand-btn');
@@ -1180,10 +1402,36 @@ function renderGrid(filter){
       btn.classList.toggle('open');
       btn.firstChild.textContent = panel.classList.contains('open') ? 'Hide breakdown ' : 'Full breakdown ';
     });
+
+    const editBtn = card.querySelector('.edit-btn');
+    const editForm = card.querySelector('.edit-form');
+    editBtn.addEventListener('click', ()=>{ editForm.classList.toggle('open'); });
+
+    card.querySelector('.edit-save').addEventListener('click', ()=>{
+      const origName = p.originalName || p.name;
+      const newName = card.querySelector('.edit-name').value.trim();
+      const newPrice = card.querySelector('.edit-price').value;
+      const newNote = card.querySelector('.edit-note').value.trim();
+      squadEdits[origName] = { name: newName, price: newPrice, note: newNote };
+      saveEdits(squadEdits);
+      updateResetAllVisibility();
+      renderGrid(currentFilter);
+    });
+
+    card.querySelector('.edit-reset').addEventListener('click', ()=>{
+      const origName = p.originalName || p.name;
+      delete squadEdits[origName];
+      saveEdits(squadEdits);
+      updateResetAllVisibility();
+      renderGrid(currentFilter);
+    });
+
     grid.appendChild(card);
   });
 }
+updateResetAllVisibility();
 renderGrid('all');
+fetchLiveData();
 
 document.querySelectorAll('.pill').forEach(pill=>{
   pill.addEventListener('click', ()=>{
@@ -1333,6 +1581,17 @@ const log = document.getElementById('assistantLog');
 const input = document.getElementById('assistantInput');
 const sendBtn = document.getElementById('assistantSend');
 
+// --- Chat memory (persisted per-browser via localStorage) ---
+const CHAT_KEY = 'fpl_assistant_chat_v1';
+function loadChatHistory(){
+  try{ return JSON.parse(localStorage.getItem(CHAT_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function saveChatHistory(history){
+  localStorage.setItem(CHAT_KEY, JSON.stringify(history.slice(-40))); // cap to last 40 messages
+}
+let chatHistory = loadChatHistory();
+
 function escapeHtml(str){
   const div = document.createElement('div');
   div.textContent = str;
@@ -1372,7 +1631,7 @@ function inlineFormat(str){
     .replace(/`(.+?)`/g, '<code>$1</code>');
 }
 
-function addMsg(role, text){
+function addMsg(role, text, persist=true){
   const div = document.createElement('div');
   div.className = 'msg ' + role;
   if(role === 'assistant'){
@@ -1382,8 +1641,27 @@ function addMsg(role, text){
   }
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
+  if(persist){
+    chatHistory.push({role, text});
+    saveChatHistory(chatHistory);
+  }
   return div;
 }
+
+// Restore previous conversation on load
+if(chatHistory.length){
+  chatHistory.forEach(m=>addMsg(m.role, m.text, false));
+} else {
+  addMsg('assistant', "Ask me about your squad — injuries, transfer targets, captaincy calls. I'll factor in what you actually own.", false);
+}
+
+document.getElementById('clearChatBtn').addEventListener('click', ()=>{
+  if(!confirm('Clear this conversation? This only clears your local chat history.')) return;
+  chatHistory = [];
+  saveChatHistory(chatHistory);
+  log.innerHTML = '';
+  addMsg('assistant', "Chat cleared. Ask me anything about your squad.", false);
+});
 
 async function sendMessage(){
   const text = input.value.trim();
@@ -1391,7 +1669,7 @@ async function sendMessage(){
   addMsg('user', text);
   input.value = '';
   sendBtn.disabled = true;
-  const thinking = addMsg('assistant', 'Thinking…');
+  const thinking = addMsg('assistant', 'Thinking…', false);
 
   try{
     const res = await fetch('/api/assistant', {
