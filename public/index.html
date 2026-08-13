@@ -792,6 +792,34 @@
   }
   .sugg-chip:hover{ border-color:var(--gold-bright); color:var(--chalk); }
 
+  /* ===== STICKY NAV ===== */
+  .sticky-nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(10,43,32,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    display:flex;
+    gap:4px;
+    overflow-x:auto;
+    padding:10px 24px;
+  }
+  .sticky-nav a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--chalk-dim);
+    text-decoration:none;
+    padding:7px 13px;
+    border-radius:999px;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .sticky-nav a:hover{ color:var(--chalk); background:rgba(242,239,228,0.06); }
+  .sticky-nav a.active{ color:var(--turf-dark); background:var(--gold-bright); font-weight:600; }
+
   /* ===== LIVE DATA BADGE ===== */
   .live-banner{
     display:flex;
@@ -928,6 +956,15 @@
 </head>
 <body>
 
+  <nav class="sticky-nav" id="stickyNav">
+    <a href="#squad" data-section="squad">Squad</a>
+    <a href="#weekly" data-section="weekly">Weekly XI</a>
+    <a href="#chips" data-section="chips">Chips</a>
+    <a href="#contingency" data-section="contingency">Contingency</a>
+    <a href="#assistant" data-section="assistant">AI Assistant</a>
+    <a href="#budget-note" data-section="budget-note">Budget</a>
+  </nav>
+
   <div class="hero">
     <div class="eyebrow">2026/27 · Gameweek 1</div>
     <h1>Team Sheet <span>&amp; Data</span></h1>
@@ -952,7 +989,7 @@
   <section id="squad">
     <div class="section-head">
       <h2>Full Squad</h2>
-      <span class="count">15 players · £100.0m</span>
+      <span class="count">15 players · £102.5m</span>
     </div>
     <button class="reset-all-btn" id="resetAllBtn" style="display:none;">↺ Reset all edits to defaults</button>
     <div class="pills" id="pills">
@@ -1037,9 +1074,10 @@
   <section id="budget-note">
     <div class="section-head">
       <h2>Budget Check</h2>
-      <span class="count">£100.0m · £0.0m ITB</span>
+      <span class="count">£102.5m · £2.5m over</span>
     </div>
-    <p class="gw-reasoning">Squad prices were re-balanced down from an earlier ~£104m estimate to land exactly at £100.0m, with zero in the bank. The trims came entirely from bench-tier players whose prices were the least certain to begin with (Cash, Konsa, Andersen and Williams down to £4.0m, Szoboszlai to £6.5m, Gross to £4.5m) — nothing was cut from the core starters (Haaland, Saka, Rice, Bruno, Gabriel, João Pedro, Calvert-Lewin) since those prices came from more directly confirmed sources. Treat this as a working budget rather than gospel: once official GW1 prices go live, some of these will land a little higher or lower, and any leftover ITB is fair game to spend on an upgrade.</p>
+    <p class="gw-reasoning"><strong>Update:</strong> Bruno Fernandes and Szoboszlai's official 2026/27 prices are now confirmed, and both came in higher than earlier estimates — Bruno at £12.0m (not £10.0m — the joint-biggest price rise of any player this season) and Szoboszlai at £7.0m (not £6.5m). That's a genuine +£2.5m the squad now costs, not something to fix by shaving bench prices further — Cash, Konsa, Andersen and Williams are already at the realistic £4.0m floor, and trimming further there would mean fabricating numbers rather than reporting honest ones. Practically: this exact 15 costs £102.5m, £2.5m over a standard £100m budget. The live price badges on each card (pulled from the official API automatically on page load) will confirm the rest of the squad's real prices too — check those before locking your actual team, and use the in-app Edit button to swap out ~£2.5m of bench budget if you want to land under £100m exactly.</p>
+  </section>
 
   <footer>
     NOTE — Projected points are directional estimates built from last season's output, fixture difficulty, and role security, not the official FPL algorithm. Several 2026/27 prices and roles (Szoboszlai's penalty duty, Andersen's exact price, final squad prices) are still preseason-fluid. Re-verify against the live FPL app before the August 21 deadline.
@@ -1076,10 +1114,10 @@ const PLAYERS = [
   {name:"Declan Rice", pos:"MID", team:"Arsenal", price:7.5, pts:"30–34", why:"184 points last season — set-piece plus defensive-contribution combo.", start:true, x:38, y:50, tags:["nailed"],
     stat:"184 pts, 9 assists, elite defensive-contribution volume", risk:"Some fitness questions floated in preseason — worth a final check before deadline.",
     detail:"Rice is one of the rare midfielders who scores from both ends of the pitch in FPL terms — he's a genuine set-piece and chance-creation threat going forward, and he racks up defensive-contribution points at a rate few midfielders match, thanks to how much defensive work he still does at the base of Arsenal's midfield. That dual profile is why he outscored a lot of more attack-minded midfielders last season despite not being a primary goal threat. The only asterisk is some fitness chatter heading into preseason — nothing confirmed as serious, but worth a last look before you lock your squad."},
-  {name:"Bruno Fernandes", pos:"MID", team:"Man Utd", price:10.0, pts:"36–40", why:"Top scorer in Fantasy over last season's final 17 gameweeks; favorable Hull/Ipswich opener.", start:true, x:62, y:46, tags:["nailed","value"],
-    stat:"Top-scoring player in Fantasy across the season's final 17 gameweeks", risk:"One of the priciest midfielders in the game — a big chunk of budget in one player.",
+  {name:"Bruno Fernandes", pos:"MID", team:"Man Utd", price:12.0, pts:"36–40", why:"Confirmed at £12.0m for 2026/27 — the joint-biggest price rise in the game. Still the pick despite the cost.", start:true, x:62, y:46, tags:["nailed","value"],
+    stat:"Confirmed £12.0m — the joint-biggest price rise of any player for 2026/27, up £3.0m on last season", risk:"At £12.0m he's now more expensive than several forwards — a genuinely large chunk of budget for one midfielder.",
     detail:"Fernandes' case is about recent form, not reputation — under Michael Carrick's management from Gameweek 22 onward last season, he was the single highest-scoring player in the entire game, averaging 7.6 points per match. He takes penalties and set pieces, so his points floor doesn't depend on open-play goals alone. Add in a genuinely kind opener — back-to-back matches against two promoted sides, Hull away then Ipswich at home — and he's arguably a stronger early-season captaincy rival to Haaland than his price alone would suggest."},
-  {name:"Dominik Szoboszlai", pos:"MID", team:"Liverpool", price:6.5, pts:"26–30", why:"Elite presser and set-piece weapon, in play for penalties post-Salah.", start:true, x:15, y:48, tags:["value","risk"],
+  {name:"Dominik Szoboszlai", pos:"MID", team:"Liverpool", price:7.0, pts:"26–30", why:"Elite presser and set-piece weapon, in play for penalties post-Salah.", start:true, x:15, y:48, tags:["value","risk"],
     stat:"205 crosses, 78 chances created, 120 passes into the box last season", risk:"Exact role under new manager Iraola isn't fully confirmed — could even start at right-back.",
     detail:"Szoboszlai's underlying output last season was among the best in the league for chance creation from a deep-lying role, and with Salah gone, he's now a live candidate for penalty duty, which would meaningfully raise his ceiling. The catch is real, though: his price hasn't moved despite that season, which the game's pricing algorithm seems to read as uncertainty, and there's genuine ambiguity about where new manager Iraola actually plays him — some reports even float him at right-back. He's a calculated bet on role rather than a locked-in certainty, which is why he's tagged as a risk here."},
   {name:"Pascal Gross", pos:"MID", team:"Brighton", price:4.5, pts:"14–18", why:"Cheap enabler, penalty-adjacent — rotation risk vs Villa opener.", start:false, tags:["risk"],
@@ -1699,6 +1737,23 @@ input.addEventListener('keydown', (e)=>{
     sendMessage();
   }
 });
+
+// --- Sticky nav scroll-spy ---
+const navLinks = document.querySelectorAll('.sticky-nav a');
+const navSections = Array.from(navLinks).map(a=>document.getElementById(a.dataset.section)).filter(Boolean);
+
+function updateActiveNav(){
+  const scrollPos = window.scrollY + 90; // account for sticky nav height
+  let current = navSections[0];
+  navSections.forEach(sec=>{
+    if(sec.offsetTop <= scrollPos) current = sec;
+  });
+  navLinks.forEach(a=>{
+    a.classList.toggle('active', a.dataset.section === current.id);
+  });
+}
+window.addEventListener('scroll', updateActiveNav, { passive:true });
+updateActiveNav();
 </script>
 
 </body>
