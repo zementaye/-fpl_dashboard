@@ -123,7 +123,10 @@ app.post('/api/assistant', rateLimit({ windowMs: 10 * 60 * 1000, max: 15 }), asy
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SQUAD_CONTEXT }] },
           contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-          generationConfig: { maxOutputTokens: 700 },
+          generationConfig: {
+            maxOutputTokens: 1024,
+            thinkingConfig: { thinkingBudget: 0 }, // disable hidden "thinking" tokens — they were eating the whole output budget and truncating replies
+          },
         }),
       }
     );
@@ -135,12 +138,18 @@ app.post('/api/assistant', rateLimit({ windowMs: 10 * 60 * 1000, max: 15 }), asy
     }
 
     const data = await response.json();
-    const text = ((data.candidates || [])[0]?.content?.parts || [])
+    const candidate = (data.candidates || [])[0];
+    const text = (candidate?.content?.parts || [])
       .map(part => part.text || '')
       .filter(Boolean)
       .join('\n');
 
-    res.json({ reply: text || "I couldn't generate a response — try rephrasing your question." });
+    const wasTruncated = candidate?.finishReason === 'MAX_TOKENS';
+    const reply = text
+      ? (wasTruncated ? text + '\n\n*(cut off — ask "continue" if you want the rest)*' : text)
+      : "I couldn't generate a response — try rephrasing your question.";
+
+    res.json({ reply });
   } catch (err) {
     console.error('Assistant request failed:', err);
     res.status(500).json({ error: 'Something went wrong reaching the assistant.' });
